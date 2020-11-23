@@ -41,6 +41,11 @@ namespace API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
             });
+             services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy => policy.AllowAnyHeader()
+                    .AllowAnyMethod().WithOrigins("https://localhost:4200"));
+            }); // We add this to allow “Cross origin resource sharing” to prevent the CORS error being triggered when using a http request between our client and our api. 
         }
 
         // This method below gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,9 +58,11 @@ namespace API
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200/")); // We add this to allow “Cross origin resource sharing” to prevent the CORS error being triggered when using a http request between our client and our api. WE MUST ADD THIS BETWEEN UseRouting AND UseAuthorization. The parameter we pass in here is the policy we are going to use. We have to AllowAnyHeader, AllowAnyMethod (put requests, get requests etc) and specify the origins we want to allow using 'WithOrigins' which is: https://localhost:4200.
 
             app.UseAuthorization();
 

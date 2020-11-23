@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-// This is the class that is auto generated when we run the 'dotnet ef migrations add InitialCreate -o Data/Migrations' on the command line. This takes a look at our classes and creates a database schema (or the code to create a database) based on our code that we’ve written so far. 
+// This is the class that is auto generated when we run the 'dotnet ef migrations add InitialCreate -o Data/Migrations' on the command line. This takes a look at our classes and creates a database schema (or the code to create a database) based on our code that we’ve written so far.  
 
 namespace API.Data.Migrations
 {
