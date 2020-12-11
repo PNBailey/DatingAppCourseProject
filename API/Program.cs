@@ -11,7 +11,7 @@ namespace API
 {
     public class Program
     {
-        public static void Main(string[] args) //Every .net app has a program.cs file. Within this class is a main method. When the .net run command executes, it’s looking for this method and it’s going to run any of the code inside the main method. Inside the main method on an api app the CreateHostBuilder method is called. This method runs the statup.cs file…
+        public static void Main(string[] args) //Every .net app has a program.cs file. Within this class is a main method. When the .net run command executes, it’s looking for this method and it’s going to run any of the code inside the main method. Inside the main method on an api app the CreateHostBuilder method is called. This method runs the startup.cs file…
         {
             CreateHostBuilder(args).Build().Run();
         }

@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     
-    [ApiController] // 1. We have to add this attribute to our controllers
-    [Route("api/[controller]")] // 2. We also have to specify the route. If the client wishes to use this controller, it will need to specify 'api/Users'
+    [ApiController] // 1. We have to add this attribute to our API controllers
+    [Route("api/[controller]")] // 2. We also have to specify the route. 
     public class BaseApiController : ControllerBase // 3. controllers always inherit from the ControllerBase class 
     {
         

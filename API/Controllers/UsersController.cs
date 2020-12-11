@@ -27,13 +27,13 @@ namespace API.Controllers
 
         // We add two endpoints here. 1 to get all of the users in our database and another 1 to get specific users 
 
-        // IS WE ARE  AKING DATABASE CALLS, ALWAYS MAKE THE CODE ASYNCHRONOUS 
+        // If WE ARE MAKING DATABASE CALLS, ALWAYS MAKE THE CODE ASYNCHRONOUS 
         [AllowAnonymous]
 
         [HttpGet] //We use this attribute when we want to get data from the database 
-        public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers() { // We specify the type that we want to get back from the request. We use the collections type Ienumerable and the type of collection we want here is the AppUser type we created in our AppUser Entity class. Ienumerable allows us to use simple iteration over a collection of a specified type. We ciould have used the 'List' type here instead. This is an async method as we would need to wait for the data to come back and allow other code to execute. This makes the app more scalable 
+        public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers() { // We specify the type that we want to get back from the request. We use the collections type Ienumerable and the type of collection we want here is the AppUser type we created in our AppUser Entity class. Ienumerable allows us to use simple iteration over a collection of a specified type. We could have used the 'List' type here instead. This is an async method as we would need to wait for the data to come back and allow other code to execute. This makes the app more scalable 
 
-                return await _context.Users.ToListAsync(); // We use the linq method 'ToListAsync' here to convert the Users data from our database to a list. We have to use the async version of this method so that other can can execute whilst this gets the data in the background. When the request now goes to the database, it pauses and waits. It defers it to a 'Task' that then goes to the query to the database. When the task comes back, we need to get the results out of the task and we do that by using the await keyword
+                return await _context.Users.ToListAsync(); // We use the linq method 'ToListAsync' here to convert the Users data from our database to a list. We have to use the async version of this method so that other code can execute whilst this gets the data in the background. When the request now goes to the database, it pauses and waits. It defers it to a 'Task' that then goes to the query to the database. When the task comes back, we need to get the results out of the task and we do that by using the await keyword
 
 
         } 

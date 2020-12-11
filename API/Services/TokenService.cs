@@ -25,7 +25,7 @@ namespace API.Services
         }
         public string CreateToken(AppUser user) // A token can take claims, credentials and other information
         {
-            var claims = new List<Claim>  // We start off we identifying what claims we are going to put inside of this token. 
+            var claims = new List<Claim>  // We start off by identifying what claims we are going to put inside of this token. 
             {
                 new Claim(JwtRegisteredClaimNames.NameId, user.UserName) // This will be our name identifier for just about everything. We use the NameId to store the user.userName
             };
@@ -47,7 +47,7 @@ namespace API.Services
 
             return tokenHandler.WriteToken(token);
 
-            // This is a lot of code here but ultimately all we need to know is that this is the code that will create our token. When we want to create a new token, we create a new instance of this class and pass in the config (this is in the constructor) we then use the create token method which allows us to create a new token based on the user
+            // This is a lot of code here but ultimately all we need to know is that this is the code that will create our token. When we want to create a new token within a class, we inject this service into the class. We can then use the create token method which allows us to create a new token based on the user
 
 
         }

@@ -18,6 +18,7 @@ namespace API.Extensions
                  options.TokenValidationParameters = new TokenValidationParameters 
                  {
                      ValidateIssuerSigningKey = true, // Our server signs the token, and we need to tell it to actually validate this token is correct
+                     
                      // Then we need to issue a valid sign in key 
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"])), 
                     ValidateIssuer = false, // This is the API server. We set this to false
