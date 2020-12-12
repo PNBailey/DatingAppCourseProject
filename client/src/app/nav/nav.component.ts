@@ -11,12 +11,12 @@ import { AccountService } from '../_services/account.service';
 export class NavComponent implements OnInit {
 
   model: any = {};
-  currentUser$: Observable<User>;
+  // currentUser$: Observable<User>; // We do't need this property as we access the accountservice straight from our html template 
 
-  constructor(private accountService: AccountService) { }
+  constructor(public accountService: AccountService) { } // By making the account service public here, we can access it in our html template of this component. This means we don't have to import the currentUser$ object as we did below and we can access it sraight from the account service in our html template
 
   ngOnInit() {
-this.currentUser$ = this.accountService.currentUser$; // We get the observable from our account service. The observable in the account service is a replaysubject which stores the value of the user that is logged in (if there is a user logged in). Getting the observable like this allows us to use the async pipe in our html code in the header html file. 
+// this.currentUser$ = this.accountService.currentUser$; // We get the observable from our account service. The observable in the account service is a replaysubject which stores the value of the user that is logged in (if there is a user logged in). Getting the observable like this allows us to use the async pipe in our html code in the header html file. 
   }
 
   login() {

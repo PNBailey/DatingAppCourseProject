@@ -1,0 +1,16 @@
+<form #registerForm="ngForm" (ngSubmit)="register()" autocomplete="off"><!--#registerForm="ngForm" marjks this is as an angular form -->
+<h2 class="text-center text-primary">Sign Up</h2>
+<hr>
+<div class="form-group">
+    <input type="text" class="form-control" name="username" [(ngModel)]="model.username" placeholder="Username"> <!--anytime we use the NgModel, we have to give the input element a name. Using [(ngModel)]="model.username" binds to the empty model object in our .ts file and creates a new property called username. Whatever the user enters into the input field here will automatically be saved in the username property  -->
+</div>
+
+
+<div class="form-group">
+    <input type="password" class="form-control" name="password" [(ngModel)]="model.password" placeholder="Password"> <!--anytime we use the NgModel, we have to give the input element a name. Using [(ngModel)]="model.password" binds to the empty model object in our .ts file and creates a new property called password. Whatever the user enters into the input field here will automatically be saved in the username property  -->
+</div>
+<div class="form-group text-center">
+    <button class="btn btn-success mr-2" type="submit">Register</button>
+    <button class="btn btn-default mr-2" (click)="cancel()" type="button">Cancel</button>
+</div>
+</form> 
