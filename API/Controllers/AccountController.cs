@@ -61,7 +61,7 @@ namespace API.Controllers
 
             return new UserDto // We return the userDto so that we are able to access it when the method is called. This is the object that will be returned from our http Register post. We do this as we don;t want to receive the actual user object back as this includes the password etc. We also want to receive the token back as this contains the expiry time 
             {
-                UserName = user.UserName, // we assign the user name to the users user name from the app user we create above
+                Username = user.UserName, // we assign the user name to the users user name from the app user we create above
                 Token = _tokenService.CreateToken(user) // 
             };
         }
@@ -85,7 +85,7 @@ namespace API.Controllers
 
                   return new UserDto // We return the userDto so that we are able to access it when the method is called. This is the object that will be returned from our http Register post. We do this as we don;t want to receive the actual user object back as this includes the password etc. We also want to receive the token back as this contains the expiry time 
             {
-                UserName = user.UserName, // we assign the user name to the users user name from the app user we create above
+                Username = user.UserName, // we assign the user name to the users user name from the app user we create above
                 Token = _tokenService.CreateToken(user) // We get our token using the create token method in our token service file 
             };
         }
