@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using API.Data;
 using API.Extensions;
 using API.Interfaces;
+using API.Middleware;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -54,13 +55,7 @@ namespace API
         // This method below gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment()) // This checks to see whether we are in devlopment mode. 
-            {
-                app.UseDeveloperExceptionPage(); // If we are in devlopment mode and our app encounters a problem, the  we use the UseDeveloperExceptionPage.
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
-            }
-
+            app.UseMiddleware<ExceptionMiddleware>(); // We add our customer exceptionmiddleware exception handling code to the top of the configure method
             app.UseHttpsRedirection();
 
             app.UseRouting();

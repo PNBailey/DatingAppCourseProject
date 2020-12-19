@@ -17,6 +17,9 @@
                         <a class="nav-link" href="#" (click)="logout()">logout</a>
                     </li>
                 </ng-container>
+                <li class="nav-item">
+                    <a class="nav-link" routerLinkActive='active' routerLink="/errors">Errors</a>
+                </li>
             </ul>
 
             <div class="dropdown" *ngIf="(accountService.currentUser$ | async) as user" dropdown>  <!--adding the 'as user' here allows us to use the 'user' property in this template -->

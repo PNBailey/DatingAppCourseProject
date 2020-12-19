@@ -12,6 +12,8 @@ namespace API.DTOs
         public string UserName { get; set; }
 
         [Required] // There are many different types of validation such as email address validation, phone number validation etc 
+
+        [StringLength(8, MinimumLength = 4)] // Thi validator ensures that at least 4 charcters and max 8 charcters are enetered by the user for the password 
         public string Password { get; set; }
         
     }

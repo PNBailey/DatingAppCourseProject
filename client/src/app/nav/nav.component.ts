@@ -30,7 +30,7 @@ export class NavComponent implements OnInit {
       this.router.navigateByUrl('/members');
     }, error => {
       console.log(error);
-      this.toastr.error(error.error); // This allows us to get the error message from the http response
+      // this.toastr.error(error.error); // This allows us to get the error message from the http response. The error is now handled in our error handling middleware on the api 
       
     })
   }
