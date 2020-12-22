@@ -1,6 +1,8 @@
 using API.Data;
+using API.Helpers;
 using API.Interfaces;
 using API.Services;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,10 @@ namespace API.Extensions
 
         
             services.AddScoped<ITokenService, TokenService>(); // This is what we need to add so our token service to enable us to use the service in other parts of our app. The Addscoped is scoped to the lifetime of the http request in this case. When the request comes in and we have this service injected into that particular controller then a new instance of this service is created and when the request is finished, the service is disposed. We use this one almost all of the time. 
+
+            services.AddScoped<IUserRepository, UserRepository>();
+
+            services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly); // We must also tell the AutoMapper where the profiles are located in our project. This is enough for automapper to go ahead and find those profiles (CreateMaps) we created there. 
 
 
             services.AddDbContext<DataContext>(options => // As we want to inject the DataContext into other parts of our app, we use our configure services method. We also need to create a connection string for our database. We use the AddDbContext to add this class. We pass in some options.

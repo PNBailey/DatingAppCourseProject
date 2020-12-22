@@ -28,7 +28,7 @@ namespace API.Middleware
 
         {
             try {
-                await _next(context); // Here we get our context and simply pass this onto the next piece of middleware. 
+                await _next(context); // Here we get our context and simply pass this onto the next piece of middleware. So if there is no exception error, the http response simply gets executed and the result is successfully returned
             }
 
             catch (Exception ex)

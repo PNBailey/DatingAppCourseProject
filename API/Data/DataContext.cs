@@ -16,6 +16,8 @@ namespace API.Data // This should match the folder paths
         }
 
         public DbSet<AppUser> Users { get; set; } // We add a DbSet. We pass in the type that we want to create a database set for (in this case Users). The Users we specify here is the table we are calling. We then need to add this configuration to our starter class so we can inject the data context into other parts of our app 
+
+        
         
     }
 }
