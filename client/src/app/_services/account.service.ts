@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 import { User } from '../Models/user';
 
 @Injectable({
@@ -9,7 +10,7 @@ import { User } from '../Models/user';
 })
 export class AccountService {
 
-  baseUrl = 'https://localhost:5001/api/';
+  baseUrl = environment.apiUrl;
 
   private currentUserSource = new ReplaySubject<User>(1); // This is a special type of observable. I'ts lile a buffer object. It's going to store the values in here and anytime a subscriber subscribes to the observable, it's going to emit the last value inside it. In the parenthesis, we specify how many previous values we want it to store 
   currentUser$ = this.currentUserSource.asObservable(); // By convention, we add a $ at the end of an observable name. 

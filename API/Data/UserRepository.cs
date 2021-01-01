@@ -41,7 +41,7 @@ namespace API.Data
         {
             return await _context.Users
             .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
-            .ToListAsync(); // This actually executes the databse query and coverts it to a list 
+            .ToListAsync(); // This actually executes the database query and coverts it to a list 
         }
 
         public async Task<AppUser> GetUserByIdAsync(int id)
@@ -59,7 +59,7 @@ namespace API.Data
         public async Task<IEnumerable<AppUser>> GetUsersAsync()
         {
             return await _context.Users
-            .Include(p => p.Photos) // We can use eager loading here to get a related colleation back with the request (users photos in this case). As the AppUser entity has a photos property and the photos entity has an AppUser property, this is classed as circular reference and will throw a 500 error. We resolve this by shaping our data before we return it with a DTO
+            .Include(p => p.Photos) // We can use eager loading here to get a related collection back with the request (users photos in this case). As the AppUser entity has a photos property and the photos entity has an AppUser property, this is classed as circular reference and will throw a 500 error. We resolve this by shaping our data before we return it with a DTO
             .ToListAsync();
         }
 
