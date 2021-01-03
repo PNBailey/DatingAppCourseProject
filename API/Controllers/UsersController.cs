@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using API.Data;
 using API.DTOs;
@@ -72,5 +73,25 @@ namespace API.Controllers
 
 
         }
+
+        [HttpPut] // The HttpPut will allow us to update a respurce on our server. As the HttpPut different to the HttpGet, we can use the same end point as the HttpGet above (which is the default /users endpoint)
+
+        public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto) { // As the client already has the information we are updating and we don't need to receive anything back from the http request, we don't provide a return type like we do in the other methods above
+
+        var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // We need to get hold of the user and the users username. We don't want to trust the user to manually input their username when updating their profile. We want to get it from what we are authenticating against which is the token. Inside a controller we have access to a claims principle of the user. This contains information about their identity. The token contains this username as we specified this in our token service file
+
+        var user = await _userRepository.GetUserByUsernameAsync(username);
+
+        _mapper.Map(memberUpdateDto, user); // When we using mapper to update an object, we can use the Map method. So this will prevent us from manually maping our memberUpdateDto to our user object and it will handle this for this us
+
+        _userRepository.Update(user); // This update method will add a flag to our user object to say that this object has been updated by entity framework. This guarantees that we are not going to get an exception or an error when we update the user in our database
+
+        if (await _userRepository.SaveAllAsync()) return NoContent(); // We use the NoContent when we don't need to receive any data back from the http request. The SaveAllAsync method returns either 1 or -1, hence we can use it in a conditional statement 
+
+        return BadRequest("Falied to update user"); 
+
+
+
+        }   
     }
 }

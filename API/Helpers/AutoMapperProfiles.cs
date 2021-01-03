@@ -14,6 +14,8 @@ namespace API.Helpers
             .ForMember(dest => dest.PhotoUrl, opt => opt.MapFrom(src => src.Photos.FirstOrDefault(x => x.IsMain).Url)) // As we want to populate the Photo Url property, we add some configuration. ForMember means: which proerty do we want to affect? the first parameter we pass in is the destination: What property are we looking to affect? The next part is the options. Here we can tell it where we want it to map from specifically. So this will go into the users photo collection and get the first photo or default that isMain and get the url from that. Now Automapper will add the photo url to the Member Dto when it does it's conversion rather than just returning null for the photo url
             .ForMember(dest => dest.Age, opt => opt.MapFrom(src => src.DateOfBirth.CalculateAge())); // Rather than calculate the age of the user within the Appuser class (this is not very efficient), we calculate the age here when the AppUser is converted to a Member Dto by automapper 
             CreateMap<Photo, PhotoDto>();
+
+            CreateMap<MemberUpdateDto, AppUser>(); // As we want to map our updated member when the user updates their profile, we need to build this into our automapper
         }
 
         // As we want to add this as a dependancy that we can inject, we need to add it to our applicationservice extensions
