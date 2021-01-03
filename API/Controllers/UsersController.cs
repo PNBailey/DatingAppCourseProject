@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using API.Data;
 using API.DTOs;
 using API.Entities;
+using API.Extensions;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,10 +28,12 @@ namespace API.Controllers
     // AS WE ARE INHERITING FROM THE BASEAPICONTROLLER CLASS THAT WE CREATED AS A BASE CLASS, WE DO NOT NEED TO ADD THE [ApiController] ATTRIBUTE, THE [Route("api/[controller]")] OR THE BASEAPIRCONTROLLER IMPLEMENTAION ABOVE AS THE BASE CONTROLLER ALREADY HAS THIS
     {
         private readonly IMapper _mapper;
+        private readonly IPhotoService _photoService;
 
         private readonly IUserRepository _userRepository;
-        public UsersController(IUserRepository userRepository, IMapper mapper) // We have to inject a dependancy to the DataContext as we want to get some data from the database from within this controller. With this private property above and this constructor with dependancy injection, we have access to the database via the DbContext just by using _context
+        public UsersController(IUserRepository userRepository, IMapper mapper, IPhotoService photoService) // We have to inject a dependancy to the DataContext as we want to get some data from the database from within this controller. With this private property above and this constructor with dependancy injection, we have access to the database via the DbContext just by using _context
         {
+            _photoService = photoService;
             _mapper = mapper;
             _userRepository = userRepository;
 
@@ -52,9 +56,9 @@ namespace API.Controllers
 
             // Rather than do all the below where we map each user to a member Dto using automapper locally, we use the GetMembersAsync method which maps each user at the database level as this is more efficient.    
 
-           // var users = await _userRepository.GetUsersAsync(); // We use the linq method 'ToListAsync' here to convert the Users data from our database to a list. We have to use the async version of this method so that other code can execute whilst this gets the data in the background. When the request now goes to the database, it pauses and waits. It defers it to a 'Task' that then goes to the query to the database. When the task comes back, we need to get the results out of the task and we do that by using the await keyword
+            // var users = await _userRepository.GetUsersAsync(); // We use the linq method 'ToListAsync' here to convert the Users data from our database to a list. We have to use the async version of this method so that other code can execute whilst this gets the data in the background. When the request now goes to the database, it pauses and waits. It defers it to a 'Task' that then goes to the query to the database. When the task comes back, we need to get the results out of the task and we do that by using the await keyword
 
-           // var usersToReturn = _mapper.Map<IEnumerable<MemberDto>>(users); // As we created our autoMapper Create Maps, we can use the automapper here to convert the type from Appusers to MemberDto's. This is to prevent the circular reference issue we had with the users photos
+            // var usersToReturn = _mapper.Map<IEnumerable<MemberDto>>(users); // As we created our autoMapper Create Maps, we can use the automapper here to convert the type from Appusers to MemberDto's. This is to prevent the circular reference issue we had with the users photos
 
             // return Ok(usersToReturn); // This prevents a type error with this method as this returns an actio result but the method in the inherited interface did not return an action result 
 
@@ -76,22 +80,49 @@ namespace API.Controllers
 
         [HttpPut] // The HttpPut will allow us to update a respurce on our server. As the HttpPut different to the HttpGet, we can use the same end point as the HttpGet above (which is the default /users endpoint)
 
-        public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto) { // As the client already has the information we are updating and we don't need to receive anything back from the http request, we don't provide a return type like we do in the other methods above
-
-        var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // We need to get hold of the user and the users username. We don't want to trust the user to manually input their username when updating their profile. We want to get it from what we are authenticating against which is the token. Inside a controller we have access to a claims principle of the user. This contains information about their identity. The token contains this username as we specified this in our token service file
-
-        var user = await _userRepository.GetUserByUsernameAsync(username);
-
-        _mapper.Map(memberUpdateDto, user); // When we using mapper to update an object, we can use the Map method. So this will prevent us from manually maping our memberUpdateDto to our user object and it will handle this for this us
-
-        _userRepository.Update(user); // This update method will add a flag to our user object to say that this object has been updated by entity framework. This guarantees that we are not going to get an exception or an error when we update the user in our database
-
-        if (await _userRepository.SaveAllAsync()) return NoContent(); // We use the NoContent when we don't need to receive any data back from the http request. The SaveAllAsync method returns either 1 or -1, hence we can use it in a conditional statement 
-
-        return BadRequest("Falied to update user"); 
+        public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto)
+        { // As the client already has the information we are updating and we don't need to receive anything back from the http request, we don't provide a return type like we do in the other methods above
 
 
 
-        }   
+            var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername()); // We need to get hold of the user and the users username. We don't want to trust the user to manually input their username when updating their profile. We want to get it from what we are authenticating against which is the token. Inside a controller we have access to a claims principle of the User. This contains information about their identity. The token contains this username as we specified this in our token service file. The 'User' claims principle is accessible in the controllers. See Claims principle extension method file 
+
+            _mapper.Map(memberUpdateDto, user); // When we using mapper to update an object, we can use the Map method. So this will prevent us from manually maping our memberUpdateDto to our user object and it will handle this for this us
+
+            _userRepository.Update(user); // This update method will add a flag to our user object to say that this object has been updated by entity framework. This guarantees that we are not going to get an exception or an error when we update the user in our database
+
+            if (await _userRepository.SaveAllAsync()) return NoContent(); // We use the NoContent when we don't need to receive any data back from the http request. The SaveAllAsync method returns either 1 or -1, hence we can use it in a conditional statement 
+
+            return BadRequest("Falied to update user");
+
+        }
+
+        [HttpPost("add-photo")]
+        public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file)// We need pass back the id of the photo and whether the photo is the main photo 
+        {
+            var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername()); // The GetUserByUsernameAsync method includes our users photos as we are eagerly loading the photos with the user as we used the 'Include' method in our userRepository 
+
+            var result = await _photoService.AddPhotoAsync(file);
+
+            if(result.Error != null) return BadRequest(result.Error.Message); // If the request doesn't work, there will be an error property attached to the result object we created above. The error message here will be coming from cloudinary
+
+            var photo = new Photo 
+            {
+                Url = result.SecureUrl.AbsoluteUri,
+                PublicId = result.PublicId
+            };
+
+            if (user.Photos.Count == 0)  
+            {
+                photo.IsMain = true; // This will set the users photo to their main photo if they don't have any other photos 
+            }
+
+            user.Photos.Add(photo); // This adds a flag to the user to say changes have been made so that when we use our saveall async method below, the user is updated in our database 
+
+            if(await _userRepository.SaveAllAsync())
+                return _mapper.Map<Photo, PhotoDto>(photo); // We map our photo to our photo dto as we only want to return our Photo Dto properties rather than our full Photo object  
+
+            return BadRequest("Problem adding photo");
+        }
     }
 }
