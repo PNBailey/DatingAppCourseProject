@@ -22,8 +22,7 @@ export class AccountService {
       map((response: User) => { // The map RXJS operator allows us to do something to each of the elements in the response data 
         const user = response; // This saves the response to a user variable that we can use in a test below
         if(user) {
-          localStorage.setItem('user', JSON.stringify(user));
-          this.currentUserSource.next(user);
+          this.setCurrentUser(user);
         }
       })
     ) 
@@ -35,8 +34,7 @@ export class AccountService {
     return this.http.post(this.baseUrl + 'account/register', model).pipe(
     map((user: User) => {
       if(user) {
-        localStorage.setItem('user', JSON.stringify(user));
-        this.currentUserSource.next(user);
+        this.setCurrentUser(user);
       }
       return user;
     }))
@@ -44,7 +42,9 @@ export class AccountService {
   }
 
   setCurrentUser(user: User) {
+    localStorage.setItem('user', JSON.stringify(user));
     this.currentUserSource.next(user);
+    
   }
 
   logout() {

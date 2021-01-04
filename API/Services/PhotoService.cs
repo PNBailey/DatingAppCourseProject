@@ -37,7 +37,7 @@ namespace API.Services
                     Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face") // This defines what we want to transform our image into. Cloudinary will then take care of cropping and resizing the image etc 
                 };
 
-                uploadResult = await _cloudinary.UploadAsync(uploadParams); // This is the part where we actually upload the file to cloudinary 
+                uploadResult = await _cloudinary.UploadAsync(uploadParams); // This is the part where we actually upload the file to cloudinary. When the UploadAsync is called, it returns the result of the uploaded which is the url and the photo id. It can also return an error message if there was a problem uploading the image 
            }
 
             return uploadResult; // This returns the upload Result which we get back from cloudinary which is the url and the public id (which is the photo id) to the client 

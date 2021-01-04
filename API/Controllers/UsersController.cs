@@ -130,5 +130,54 @@ namespace API.Controllers
 
             return BadRequest("Problem adding photo");
         }
+
+        [HttpPut("set-main-photo/{photoId}")]
+        public async Task<ActionResult> SetMainPhoto(int photoId) 
+        {
+            var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+
+            var photo = user.Photos.FirstOrDefault(x => x.Id == photoId); // We get the photo from the users photo array using the photo id
+
+            if(photo.IsMain) return BadRequest("This is already your main photo"); // We check to see whether the photo is already the users main photo
+
+            var currentMain = user.Photos.FirstOrDefault(x => x.IsMain); // This gets the photo from the users photos array where the photos isMain property is set to true. This: "FirstOrDefault(x => x.IsMain);" is the shorthand for FirstOrDefault(x => x.IsMain == true);
+
+            if(currentMain != null) currentMain.IsMain = false;
+
+            photo.IsMain = true;
+
+            if(await _userRepository.SaveAllAsync()) return NoContent(); // as we don't need to send anything back from this request, we use the NoContent. We only do this if the saveallasync method returns > 0 (returns true) as this tells us it was successful 
+
+            return BadRequest("Failed to set main photo");
+            
+        }
+
+        [HttpDelete("delete-photo/{photoId}")]
+
+        public async Task<ActionResult> DeletePhoto(int photoId) 
+        {
+            var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+
+            var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
+
+            if(photo == null) return NotFound();
+
+            if(photo.IsMain) return BadRequest("You cannot delete your main photo");
+
+            if(photo.PublicId != null) // We check to see whether the photo has a public Id as if it doesn't then we don't need to delete it from cloudinary 
+            {
+                var result = await _photoService.DeletionPhotoAsync(photo.PublicId);
+                if(result.Error != null) return BadRequest(result.Error.Message);
+            } 
+
+            user.Photos.Remove(photo); // This adds the tracking flag to the entity so that when the savechanges async is used below, then the database is updated correctly 
+
+            if(await _userRepository.SaveAllAsync()) return Ok(); // We use the SaveAllAsync method from the user repository as the photos are relating to the user. 
+
+            return BadRequest("Failed to delete the photo");
+
+            
+        }
+
     }
 }

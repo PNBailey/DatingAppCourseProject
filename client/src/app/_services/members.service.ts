@@ -1,9 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { of, scheduled } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Member } from '../Models/member';
+import { User } from '../Models/user';
+import { AccountService } from './account.service';
 
 
 @Injectable({
@@ -12,8 +14,9 @@ import { Member } from '../Models/member';
 export class MembersService {
   baseUrl = environment.apiUrl;
   members: Member[] = [];
+  user: User;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private accountService: AccountService) { }
 
   getMembers() {
     if(this.members.length > 0) return of(this.members); // In this getMembers method, we only want to retrieve the members from the database if we don't already have the members in our database. As our client is expecting an observable from this getMembers method, we need to return an observable which is why we use the of keyword. Of just means we are going to return something of an observable. It turns the return of the members into an observable so that when our member list component subscribes to it, it still wors correctly.
@@ -39,6 +42,16 @@ export class MembersService {
         this.members[index] = member;
       })
     );
+  }
+
+  setMainPhoto(photoId: number) {
+
+    return this.http.put(this.baseUrl + "users/set-main-photo/" + photoId, {}); // We include an empty object as the body as put requests need a body 
+  
+  }
+
+  deletePhoto(photoId: number) {
+    return this.http.delete(this.baseUrl + 'users/delete-photo/' + photoId);
   }
 
 

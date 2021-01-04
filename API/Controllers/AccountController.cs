@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -70,7 +71,11 @@ namespace API.Controllers
 
         public async Task<ActionResult<UserDto>> Login(LoginDto loginDto) // This is our login http async method. We pass in the loginDto DTO that we created as the body of the http post request will require an object rather than two strings (username and password)
         {
-            var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == loginDto.UserName); // This will return the only element in users that matches our users details. If there is more than one elemt found with the details, it will return an exception. It will return a default value if the username is not found 
+            var user = await _context.Users.
+
+            Include(p => p.Photos)
+            
+            .SingleOrDefaultAsync(x => x.UserName == loginDto.UserName); // This will return the only element in users that matches our users details. If there is more than one elemt found with the details, it will return an exception. It will return a default value if the username is not found 
 
             if (user == null) return Unauthorized("Invalid Username"); // We test whether the default value is returned from the SingleOrDefaultAsync (null). If the default value is returned then this means the username was not found in our database. We return the Unauthorised 
 
@@ -86,7 +91,8 @@ namespace API.Controllers
                   return new UserDto // We return the userDto so that we are able to access it when the method is called. This is the object that will be returned from our http Register post. We do this as we don;t want to receive the actual user object back as this includes the password etc. We also want to receive the token back as this contains the expiry time 
             {
                 Username = user.UserName, // we assign the user name to the users user name from the app user we create above
-                Token = _tokenService.CreateToken(user) // We get our token using the create token method in our token service file 
+                Token = _tokenService.CreateToken(user), // We get our token using the create token method in our token service file 
+                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url // Using the ? optional assignment means that the PhotoUrl is nullable. This means that if there is no IsMain photo, null will be assigned to PhotoUrl.
             };
         }
 
