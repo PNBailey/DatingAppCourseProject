@@ -1,16 +1,45 @@
-<form #registerForm="ngForm" (ngSubmit)="register()" autocomplete="off"><!--#registerForm="ngForm" marjks this is as an angular form -->
+<!--THIS IS A REACTIVE FORM-->
+
+<form [formGroup]='registerForm' (ngSubmit)="register()" autocomplete="off"><!--#registerForm="ngForm" marjks this is as an angular form -->
 <h2 class="text-center text-primary">Sign Up</h2>
 <hr>
-<div class="form-group">
-    <input type="text" class="form-control" name="username" [(ngModel)]="model.username" placeholder="Username"> <!--anytime we use the NgModel, we have to give the input element a name. Using [(ngModel)]="model.username" binds to the empty model object in our .ts file and creates a new property called username. Whatever the user enters into the input field here will automatically be saved in the username property  -->
+<div class="form-group"> <!--Using the [class.is-invalid]='registerForm.get("username")' here means that if the form is invalid (if there are errors on the formcontrol that we 'get' and the field has been touched), the class is-invalid will be applied to the element-->
+    <input
+      [class.is-invalid]='registerForm.get("username").errors && registerForm.get("username").touched'
+      type="text"
+      class="form-control"
+      formControlName='username'
+      placeholder="Username"> <!--anytime we use the NgModel, we have to give the input element a name. Using [(ngModel)]="model.username" binds to the empty model object in our .ts file and creates a new property called username. Whatever the user enters into the input field here will automatically be saved in the username property  -->
+      <div class="div invalid-feedback">Please enter a username</div> <!--This 'invalid-feedback' bootstrap class will only show the element if the input element within this particular form group is invalid   -->
 </div>
 
 
 <div class="form-group">
-    <input type="password" class="form-control" name="password" [(ngModel)]="model.password" placeholder="Password"> <!--anytime we use the NgModel, we have to give the input element a name. Using [(ngModel)]="model.password" binds to the empty model object in our .ts file and creates a new property called password. Whatever the user enters into the input field here will automatically be saved in the username property  -->
+    <input
+    [class.is-invalid]='registerForm.get("password").errors && registerForm.get("password").touched'
+      type="password"
+      class="form-control"
+      formControlName='password'
+      placeholder="Confirm Password"> <!--anytime we use the NgModel, we have to give the input element a name. Using [(ngModel)]="model.password" binds to the empty model object in our .ts file and creates a new property called password. Whatever the user enters into the input field here will automatically be saved in the username property  -->
+      <div *ngIf="registerForm.get('password').hasError('required')" class="div invalid-feedback">Please enter a password</div>
+      <div *ngIf="registerForm.get('password').hasError('minlength')" class="div invalid-feedback">Password mut be at least 4 characters</div> <!--We don't use camel case for the min length or max length-->
+      <div *ngIf="registerForm.get('password').hasError('maxlength')" class="div invalid-feedback">Password mut be a maximum of 8 characters</div>
+</div>
+<div class="form-group">
+    <input
+    [class.is-invalid]='registerForm.get("confirmPassword").errors && registerForm.get("confirmPassword").touched'
+      type="password"
+      class="form-control"
+      formControlName='confirmPassword'
+      placeholder="Password">
+      <div *ngIf="registerForm.get('confirmPassword').hasError('required')" class="div invalid-feedback">Please enter a confirm password</div>
+      <div *ngIf="registerForm.get('confirmPassword').hasError('notMatching')" class="div invalid-feedback">Password must be matching</div> <!--We don't use camel case for the min length or max length-->
 </div>
 <div class="form-group text-center">
     <button class="btn btn-success mr-2" type="submit">Register</button>
     <button class="btn btn-default mr-2" (click)="cancel()" type="button">Cancel</button>
 </div>
 </form> 
+
+<p>Form Value: {{registerForm.value | json}}</p>
+<p>Form Status: {{registerForm.status | json}}</p>
