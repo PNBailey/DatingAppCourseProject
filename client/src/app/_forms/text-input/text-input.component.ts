@@ -11,7 +11,7 @@ export class TextInputComponent implements ControlValueAccessor { // The control
   @Input() label: string;
   @Input() type = 'text';
 
-  constructor(@Self() public ngControl: NgControl) { // When angular looks at dependancy injection, it's going to look inside the heirachy of things it can inject. If there's an injector that matches this that it's already got inside it's dependancy injection container. This decorator ensures that Angular will always inject what we are doing here locally into this component
+  constructor(@Self() public ngControl: NgControl) { // When angular looks at dependancy injection, it's going to look inside the heirachy of things it can inject. If there's an injector that matches this that it's already got inside it's dependancy injection container. This decorator ensures that Angular will always inject what we are doing here locally into this component. This stops angular trying to get this nControl from somewhere else in the dependancy tree
     this.ngControl.valueAccessor = this;
    } 
   writeValue(obj: any): void { // We don't need to enter anything i these methods. The functions are going to be created by the control value accessor itself. 

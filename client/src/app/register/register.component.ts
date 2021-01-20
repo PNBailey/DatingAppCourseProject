@@ -11,15 +11,17 @@ import { AccountService } from '../_services/account.service';
 export class RegisterComponent implements OnInit {
 
   model: any = {};
- 
   @Output() cancelRegister = new EventEmitter();
-
   registerForm: FormGroup; // This is for the reactive forms 
+  maxDate: Date;
+
  
   constructor(private accountService: AccountService, private toastr: ToastrService, private fb: FormBuilder) { }
 
   ngOnInit(): void {
     this.initializeForm();
+    this.maxDate = new Date();
+    this.maxDate.setFullYear(this.maxDate.getFullYear() - 18); // This is th property we pass into the app-date-input component selector in the register html file. This means that only over 18's can use the app
   }
 
   // instead of using the new FormGroup below, we use the built in Angular form builder
