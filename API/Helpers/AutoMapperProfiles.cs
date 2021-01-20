@@ -16,6 +16,8 @@ namespace API.Helpers
             CreateMap<Photo, PhotoDto>();
 
             CreateMap<MemberUpdateDto, AppUser>(); // As we want to map our updated member when the user updates their profile, we need to build this into our automapper
+
+            CreateMap<RegisterDto, AppUser>();
         }
 
         // As we want to add this as a dependancy that we can inject, we need to add it to our applicationservice extensions

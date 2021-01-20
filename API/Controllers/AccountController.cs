@@ -6,6 +6,7 @@ using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,10 +18,14 @@ namespace API.Controllers
     {
         private readonly DataContext _context;
         private readonly ITokenService _tokenService;
-        public AccountController(DataContext context, ITokenService tokenService) // We have to inject a dependancy to the DataContext as we want to get some data from the database from within this controller. With this private property above and this constructor with dependancy injection, we have access to the database via the DbContext just by using _context. We inject our token service as we want to generate a token for our user within this class 
+        private readonly IMapper _mapper;
+
+        public AccountController(DataContext context, ITokenService tokenService, IMapper mapper) // We have to inject a dependancy to the DataContext as we want to get some data from the database from within this controller. With this private property above and this constructor with dependancy injection, we have access to the database via the DbContext just by using _context. We inject our token service as we want to generate a token for our user within this class 
         {
             _tokenService = tokenService;
+            _mapper = mapper;
             _context = context;
+
 
         }
 
@@ -39,22 +44,21 @@ namespace API.Controllers
 
             }
 
+            var user = _mapper.Map<AppUser>(registerDto);
 
 
             using var hmac = new HMACSHA512(); // This provides us with our hashing algorithm that we are going to use to create a password hash. The using statement ensures when we are finished with this class, it will be dispsed of correctly. Anytime we are using a class with this using statement, it's going to call a method inside this class called 'dispose', so that is disposes of this as it should do. Any class that implements the dispose method will implement something called, the Idisposable interface. Any class that implements the Idisposable interface, has to provide this dispose method. The using method takes care of all this, it automatically disposes of the class.
 
-            var user = new AppUser // We create a new user using our Appuser entity and we initialize it using the parameters passed into the Register method 
-            {
-                UserName = registerDto.UserName.ToLower(), // We want our username to be unique in our database. We are going to use our username for many different things so we want it to be unique. We create a private helper method in this class. See UserExists method below...
+          
+                user.UserName = registerDto.UserName.ToLower(); // We want our username to be unique in our database. We are going to use our username for many different things so we want it to be unique. We create a private helper method in this class. See UserExists method below...
 
 
-                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)), // This creates a password hash using the HMACSHA512 class. This method takes a byte array as a parameter. As the password we pass in to this register method is a string, we need to make this into a byte array. This is why we use the 'hmac.ComputeHash(Encoding.UTF8.GetBytes(password))' to convert the string password that is passed into the register method into a byte array. The PasswordHash property from the Appuser expects a byte array so it is fine to pass this to the PasswordHash field. 
+                user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)); // This creates a password hash using the HMACSHA512 class. This method takes a byte array as a parameter. As the password we pass in to this register method is a string, we need to make this into a byte array. This is why we use the 'hmac.ComputeHash(Encoding.UTF8.GetBytes(password))' to convert the string password that is passed into the register method into a byte array. The PasswordHash property from the Appuser expects a byte array so it is fine to pass this to the PasswordHash field. 
 
-                PasswordSalt = hmac.Key // The hmac instance here is generated with a randomly generated key. Here we set the PasswordSalt to the randomly generated key that is created when the instance of HMACSHA512 is created 
+                user.PasswordSalt = hmac.Key; // The hmac instance here is generated with a randomly generated key. Here we set the PasswordSalt to the randomly generated key that is created when the instance of HMACSHA512 is created 
 
 
 
-            };
 
             _context.Users.Add(user); // This tells entity framework that we want to add the user we created above to our users table. We are not actually adding anything here, all we are doing is telling entity framework to track this.
 
@@ -63,7 +67,9 @@ namespace API.Controllers
             return new UserDto // We return the userDto so that we are able to access it when the method is called. This is the object that will be returned from our http Register post. We do this as we don;t want to receive the actual user object back as this includes the password etc. We also want to receive the token back as this contains the expiry time 
             {
                 Username = user.UserName, // we assign the user name to the users user name from the app user we create above
-                Token = _tokenService.CreateToken(user) // 
+                Token = _tokenService.CreateToken(user), // 
+
+                KnownAs = user.KnownAs
             };
         }
 
@@ -92,7 +98,8 @@ namespace API.Controllers
             {
                 Username = user.UserName, // we assign the user name to the users user name from the app user we create above
                 Token = _tokenService.CreateToken(user), // We get our token using the create token method in our token service file 
-                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url // Using the ? optional assignment means that the PhotoUrl is nullable. This means that if there is no IsMain photo, null will be assigned to PhotoUrl.
+                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url, // Using the ? optional assignment means that the PhotoUrl is nullable. This means that if there is no IsMain photo, null will be assigned to PhotoUrl.
+                KnownAs = user.KnownAs
             };
         }
 
