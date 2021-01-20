@@ -25,7 +25,13 @@
     </app-text-input>
     <app-text-input [formControl]='registerForm.controls["confirmPassword"]' [label]='"Confirm Password"'
         [type]='"password"'></app-text-input>
-
+        <div class="row" *ngIf="validationErrors.length > 0">
+            <ul class="text-danger">
+                <li *ngFor="let error of validationErrors">
+                    {{ error }}
+                </li>
+            </ul>
+        </div>
 
     <!--<div class="form-group"> Using the [class.is-invalid]='registerForm.get("username")' here means that if the form is invalid (if there are errors on the formcontrol that we 'get' and the field has been touched), the class is-invalid will be applied to the element
     <input
@@ -65,6 +71,7 @@
         <button class="btn btn-default mr-2" (click)="cancel()" type="button">Cancel</button>
     </div>
 </form>
+
 
 <p>Form Value: {{registerForm.value | json}}</p>
 <p>Form Status: {{registerForm.status | json}}</p>
