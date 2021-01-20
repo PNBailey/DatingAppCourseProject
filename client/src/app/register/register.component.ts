@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, Output, EventEmitter, resolveForwardRef } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { AccountService } from '../_services/account.service';
 
@@ -16,19 +16,33 @@ export class RegisterComponent implements OnInit {
 
   registerForm: FormGroup; // This is for the reactive forms 
  
-  constructor(private accountService: AccountService, private toastr: ToastrService) { }
+  constructor(private accountService: AccountService, private toastr: ToastrService, private fb: FormBuilder) { }
 
   ngOnInit(): void {
     this.initializeForm();
   }
 
-  initializeForm() { // This is for the reactive form approach
-    this.registerForm = new FormGroup({
-      username: new FormControl('', Validators.required), // The first parameter here is the starting value. The next parameter is our validation options 
-      password: new FormControl('', [Validators.required, Validators.minLength(4), Validators.maxLength(8)]), // If we need more than 1 validators we put them inside squared brackets
-      confirmPassword: new FormControl('', [Validators.required, this.matchValues('password')])
+  // instead of using the new FormGroup below, we use the built in Angular form builder
+  initializeForm() {
+    this.registerForm = this.fb.group({
+      gender: ['male'], // The first parameter here is the starting value. The next parameter is our validation options. This form control will be a radio button
+      username: ['', Validators.required], 
+      knownAs: ['', Validators.required],
+      dateOfBirth: ['', Validators.required],
+      city: ['', Validators.required],
+      country: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(8)]], // If we need more than 1 validators we put them inside squared brackets
+      confirmPassword: ['', [Validators.required, this.matchValues('password')]]
     })
   }
+
+  // initializeForm() { // This is for the reactive form approach
+  //   this.registerForm = new FormGroup({
+  //     username: new FormControl('', Validators.required), // The first parameter here is the starting value. The next parameter is our validation options 
+  //     password: new FormControl('', [Validators.required, Validators.minLength(4), Validators.maxLength(8)]), // If we need more than 1 validators we put them inside squared brackets
+  //     confirmPassword: new FormControl('', [Validators.required, this.matchValues('password')])
+  //   })
+  // }
 
   matchValues(matchTo: any): ValidatorFn { // Here we create a custoemr validator so we can ensure that what the user entrers in our confirmPassword field matches what is in the password field 
       return (control: AbstractControl) => {
