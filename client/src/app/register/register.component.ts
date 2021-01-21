@@ -49,7 +49,7 @@ export class RegisterComponent implements OnInit {
 
   matchValues(matchTo: any): ValidatorFn { // Here we create a custom validator so we can ensure that what the user entrers in our confirmPassword field matches what is in the password field 
       return (control: AbstractControl) => {
-        return control?.value === control?.parent?.controls[matchTo].value ? null : {notMatching: true} // Using this syntax gives us access to all the controls in the form as we are traversing through the form controls. This gives us access to the control that we are going to add this customer validator to (our confirmPassword control). o we are comparing the controlPassword field to the password field to ensure they match. The matchTo value is the password we want to compare this value to. If the passwords do match, we return null and therefore, the validation passes. If the passwords do not match then we attach a validator error called notMatching to the control and this will fail our form validation  
+        return control?.value === control?.parent?.controls[matchTo].value ? null : {notMatching: true} // Using this syntax gives us access to all the controls in the form as we are traversing through the form controls. This gives us access to the control that we are going to add this custom validator to (our confirmPassword control). o we are comparing the controlPassword field to the password field to ensure they match. The matchTo value is the password we want to compare this value to. If the passwords do match, we return null and therefore, the validation passes. If the passwords do not match then we attach a validator error called notMatching to the control and this will fail our form validation  
       }
   }
 
