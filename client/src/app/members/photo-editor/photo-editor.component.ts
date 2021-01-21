@@ -48,11 +48,17 @@ export class PhotoEditorComponent implements OnInit {
 
     this.uploader.onSuccessItem = (item, response, status, headers) => {
       if (response) {
-        const photo = JSON.parse(response); // This gets the photo from the JSON data that is retrieved from the response 
+        const photo: Photo = JSON.parse(response); // This gets the photo from the JSON data that is retrieved from the response 
         this.member.photos.push(photo);
+        // if member.photos is less than 1, call set as main photo and pass in response photo
+        if(photo.isMain) {
+          this.user.photoUrl = photo.url;
+          this.member.photoUrl = photo.url;
+          this.accountService.setCurrentUser(this.user);
       }
     }
   }
+}
 
   deletePhoto(photoId: number) {
     this.membersService.deletePhoto(photoId).subscribe(() => {

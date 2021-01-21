@@ -1,6 +1,6 @@
 <!--THIS IS A REACTIVE FORM-->
 
-<form [formGroup]='registerForm' (ngSubmit)="register()" autocomplete="off">
+<form [formGroup]='registerForm' (ngSubmit)="registerForm.valid && register()" autocomplete="off"> <!--Adding (ngSubmit)="registerForm.valid && register()" means that the register method will only be enabled if the form is valid-->
     <!--#registerForm="ngForm" marjks this is as an angular form -->
     <h2 class="text-center text-primary">Sign Up</h2>
     <hr>
@@ -67,11 +67,7 @@
       <div *ngIf="registerForm.get('confirmPassword').hasError('notMatching')" class="div invalid-feedback">Password must be matching</div> We don't use camel case for the min length or max length
 </div> -->
     <div class="form-group text-center">
-        <button class="btn btn-success mr-2" type="submit">Register</button>
+        <button [disabled]='!registerForm.valid' class="btn btn-success mr-2" type="submit">Register</button>
         <button class="btn btn-default mr-2" (click)="cancel()" type="button">Cancel</button>
     </div>
 </form>
-
-
-<p>Form Value: {{registerForm.value | json}}</p>
-<p>Form Status: {{registerForm.status | json}}</p>
