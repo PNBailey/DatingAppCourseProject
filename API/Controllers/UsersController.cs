@@ -6,6 +6,7 @@ using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -45,12 +46,14 @@ namespace API.Controllers
         // [AllowAnonymous]
 
         [HttpGet] //We use this attribute when we want to get data from the database 
-        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery]UserParams userParams) // Using the [FromQuery] attribute will mean that the query string will be retrieved from the userParams object we passed in. The api controller is't smart enough to retrieve the query strings (page size etc) from the userParams object without this
         { // We specify the type that we want to get back from the request. We use the collections type Ienumerable and the type of collection we want here is the AppUser type we created in our AppUser Entity class. Ienumerable allows us to use simple iteration over a collection of a specified type. We could have used the 'List' type here instead. This is an async method as we would need to wait for the data to come back and allow other code to execute. This makes the app more scalable 
 
 
 
-            var users = await _userRepository.GetMembersAsync();
+            var users = await _userRepository.GetMembersAsync(userParams);
+
+            Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages); // We always have access to our request http response in our controllers. 
 
             return Ok(users);
 
