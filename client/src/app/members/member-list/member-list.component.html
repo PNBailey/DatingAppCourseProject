@@ -3,3 +3,17 @@
         <app-member-card [member]="member"></app-member-card> <!--Here we pass the member to our member property as we have used the @input decorator in the member card component-->
     </div>
 </div>
+
+<div class="d-flex justify-content-center" *ngIf="pagination">
+    <pagination
+      [boundaryLinks]="true"
+      [totalItems]="pagination.totalItems"
+      [itemsPerPage]="pagination.itemsPerPage"
+      [(ngModel)]="pagination.currentPage"
+      (pageChanged)="pageChanged($event)"
+      previousText="&lsaquo;"
+      nextText="&rsaquo;"
+      firstText="&laquo;"
+      lastText="&raquo;">
+</pagination>
+</div> <!--This is the pagination bootstrap component we imported/exported in our shared module-->
