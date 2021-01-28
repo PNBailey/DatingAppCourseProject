@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,12 +41,23 @@ namespace API.Data
 
         public async Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams)
         {
-            var query = _context.Users // This query becomes a Iqueyable as we have the expression tree below 
-            .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)  
+            var query = _context.Users.AsQueryable(); // The AsQueryable gives us an oppurtunity to do something with this query (e.g. what we want to filter by for instance)
+            // .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)  
             // .ToListAsync(); // This actually executes the database query and coverts it to a list 
-            .AsNoTracking(); // In entity framework, when we go an get entities, Entity framework applies tracking to these entities. Becuase this is going to be a list that we only ever read from, we use the AsNoTracking to prevent the tracking on the entity 
+            // .AsNoTracking() // In entity framework, when we go an get entities, Entity framework applies tracking to these entities. Becuase this is going to be a list that we only ever read from, we use the AsNoTracking to prevent the tracking on the entity 
+            // .AsQueryable(); // This gives us an oppurtunity to do something with this query (e.g. what we want to filter by for instance)
 
-            return await PagedList<MemberDto>.CreateAsync(query, userParams.PageNumber, userParams.PageSize);  // We specify what type of PageList we want with the <MemberDto>. This means we want to return a PageList of MemberDto's. The query is the source data that the CreateAsync static method expects. So we get a PagedList ad then we create a PagedList using the parameters. This method
+            query = query.Where(user => user.UserName != userParams.CurrentUserName); // This filters out 
+            query = query.Where(user => user.Gender == userParams.Gender);
+
+            var minDob = DateTime.Today.AddYears(-userParams.MaxAge - 1); // We use the -1 so that we give the accurate year. So here we minus the MaxAge (which is just a number) from Todays date. The gives us the minDob date that we need to specify in our Where method below
+            var maxDob = DateTime.Today.AddYears(-userParams.MinAge);
+
+            query = query.Where(user => user.DateOfBirth >= minDob && user.DateOfBirth <= maxDob);
+
+
+
+            return await PagedList<MemberDto>.CreateAsync(query.ProjectTo<MemberDto>(_mapper.ConfigurationProvider).AsNoTracking(), userParams.PageNumber, userParams.PageSize);  // We specify what type of PageList we want with the <MemberDto>. This means we want to return a PageList of MemberDto's. The query is the source data that the CreateAsync static method expects. So we get a PagedList ad then we create a PagedList using the parameters. This method
         }   
 
         public async Task<AppUser> GetUserByIdAsync(int id)
