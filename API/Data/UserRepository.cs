@@ -41,7 +41,7 @@ namespace API.Data
         public async Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams)
         {
             var query = _context.Users // This query becomes a Iqueyable as we have the expression tree below 
-            .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
+            .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)  
             // .ToListAsync(); // This actually executes the database query and coverts it to a list 
             .AsNoTracking(); // In entity framework, when we go an get entities, Entity framework applies tracking to these entities. Becuase this is going to be a list that we only ever read from, we use the AsNoTracking to prevent the tracking on the entity 
 

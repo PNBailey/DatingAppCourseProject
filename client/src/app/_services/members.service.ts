@@ -24,7 +24,7 @@ export class MembersService {
 
     if(page !== null && itemsPerPage !== null) {
       params = params.append('pageNumber', page.toString()); // as the page needs to be a query string we need to convert the page from a number to a string 
-      params = params.append('pageSize', page.toString());
+      params = params.append('pageSize', itemsPerPage.toString());
     }
     
     return this.http.get<Member[]>(this.baseUrl + 'users', {observe: 'response', params}).pipe( // Adding the {observe: 'response', params} means that rather than just getting the response body back, we get the full response back. 
