@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Member } from '../Models/member';
 import { PaginatedResult } from '../Models/pagination';
+import { UserParams } from '../Models/userParams';
 
 
 @Injectable({
@@ -14,30 +15,23 @@ import { PaginatedResult } from '../Models/pagination';
 export class MembersService {
   baseUrl = environment.apiUrl;
   members: Member[] = [];
-  paginatedResult: PaginatedResult<Member[]> = new PaginatedResult<Member[]>();
   constructor(private http: HttpClient) { }
 
-  getMembers(page?: number, itemsPerPage?: number) { // The ? here means that the page can be null
+  getMembers(userParams: UserParams) { // The ? here means that the page can be null
     // if(this.members.length > 0) return of(this.members); // In this getMembers method, we only want to retrieve the members from the database if we don't already have the members in our database. As our client is expecting an observable from this getMembers method, we need to return an observable which is why we use the of keyword. Of just means we are going to return something of an observable. It turns the return of the members into an observable so that when our member list component subscribes to it, it still works correctly.
 
-    let params = new HttpParams(); // This gives us the ability to serialize our parameters. This will take care of adding this onto our query string. 
+    let params = this.getPaginationHeaders(userParams.pageNumber, userParams.pageSize);
 
-    if(page !== null && itemsPerPage !== null) {
-      params = params.append('pageNumber', page.toString()); // as the page needs to be a query string we need to convert the page from a number to a string 
-      params = params.append('pageSize', itemsPerPage.toString());
-    }
+    params = params.append('minAge', userParams.minAge.toString());
+    params = params.append('maxAge', userParams.maxAge.toString());
+    params = params.append('gender', userParams.gender);
+
     
-    return this.http.get<Member[]>(this.baseUrl + 'users', {observe: 'response', params}).pipe( // Adding the {observe: 'response', params} means that rather than just getting the response body back, we get the full response back. 
-    map(response => {
-      this.paginatedResult.result = response.body; // This is where our members array will be contained
-      if(response.headers.get('Pagination') !== null) {
-        this.paginatedResult.pagination = JSON.parse(response.headers.get('Pagination'));
-      }
-      return this.paginatedResult;
-    })
-      
-    );
+    
+    return this.getPaginatedResult<Member[]>(this.baseUrl + 'users', params);
   }
+
+  
 
   getMember(username: string) {
     const member = this.members.find(x => x.userName === username);
@@ -62,6 +56,30 @@ export class MembersService {
 
   deletePhoto(photoId: number) {
     return this.http.delete(this.baseUrl + 'users/delete-photo/' + photoId);
+  }
+
+  private getPaginatedResult<T>(url, params) { // We set the type of this method to a generic type using the T 
+    const paginatedResult: PaginatedResult<T> = new PaginatedResult<T>();
+    return this.http.get<T>(url, { observe: 'response', params }).pipe(
+      map(response => {
+        paginatedResult.result = response.body; // This is where our members array will be contained
+        if (response.headers.get('Pagination') !== null) {
+          paginatedResult.pagination = JSON.parse(response.headers.get('Pagination'));
+        }
+        return paginatedResult;
+      })
+
+    );
+  }
+
+  private getPaginationHeaders(pageNumber: number, pageSize: number) {
+    let params = new HttpParams(); // This gives us the ability to serialize our parameters. This will take care of adding this onto our query string. 
+
+      params = params.append('pageNumber', pageNumber.toString()); // as the page needs to be a query string we need to convert the page from a number to a string 
+      params = params.append('pageSize', pageSize.toString());
+
+      return params;
+    
   }
 
 

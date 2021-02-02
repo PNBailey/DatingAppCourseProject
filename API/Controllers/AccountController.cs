@@ -69,7 +69,8 @@ namespace API.Controllers
                 Username = user.UserName, // we assign the user name to the users user name from the app user we create above
                 Token = _tokenService.CreateToken(user), // 
 
-                KnownAs = user.KnownAs
+                KnownAs = user.KnownAs,
+                Gender = user.Gender
             };
         }
 
@@ -99,7 +100,8 @@ namespace API.Controllers
                 Username = user.UserName, // we assign the user name to the users user name from the app user we create above
                 Token = _tokenService.CreateToken(user), // We get our token using the create token method in our token service file 
                 PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url, // Using the ? optional assignment means that the PhotoUrl is nullable. This means that if there is no IsMain photo, null will be assigned to PhotoUrl.
-                KnownAs = user.KnownAs
+                KnownAs = user.KnownAs,
+                Gender = user.Gender
             };
         }
 
