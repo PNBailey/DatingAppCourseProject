@@ -18,6 +18,7 @@ export class MemberListComponent implements OnInit {
   pagination: Pagination;
   userParams: UserParams;
   user: User;
+  genderList = [{value: 'male', display: 'Males'}, {value: 'female', display: 'Females'}]; // We create an array of objects which will be used in our html file of this component 
 
   constructor(private memberService: MembersService, private accountService: AccountService) { 
     this.accountService.currentUser$.pipe(take(1)).subscribe(user => {
@@ -39,6 +40,11 @@ export class MemberListComponent implements OnInit {
       this.pagination = response.pagination;
       console.log(this.pagination);
     })
+  }
+
+  resetFilters() { // This ill reset our filters and will reload our members based on our default userParams (the default userParam values are set in our UserParams class in our API)
+    this.userParams = new UserParams(this.user);
+    this.loadMembers();
   }
 
   pageChanged(event: any){
