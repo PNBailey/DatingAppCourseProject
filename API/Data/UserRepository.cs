@@ -55,6 +55,13 @@ namespace API.Data
 
             query = query.Where(user => user.DateOfBirth >= minDob && user.DateOfBirth <= maxDob);
 
+            //The code below in the switch statement enables sorting of the data being retrieved from the database
+            
+            query = userParams.OrderBy switch // This is the way we create a switch statement in C#.
+            {
+                "created" => query.OrderByDescending(u => u.Created),
+                _ => query.OrderByDescending(u => u.LastActive)// The _ here is the way we state tha the default value will be used 
+            };
 
 
             return await PagedList<MemberDto>.CreateAsync(query.ProjectTo<MemberDto>(_mapper.ConfigurationProvider).AsNoTracking(), userParams.PageNumber, userParams.PageSize);  // We specify what type of PageList we want with the <MemberDto>. This means we want to return a PageList of MemberDto's. The query is the source data that the CreateAsync static method expects. So we get a PagedList ad then we create a PagedList using the parameters. This method
