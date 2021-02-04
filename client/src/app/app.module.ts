@@ -28,6 +28,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
 import { TextInputComponent } from './_forms/text-input/text-input.component';
 import { DateInputComponent } from './_forms/date-input/date-input.component';
+import { ButtonsModule } from 'ngx-bootstrap/buttons';
+
 
 
 
@@ -58,7 +60,8 @@ import { DateInputComponent } from './_forms/date-input/date-input.component';
     FormsModule,
     SharedModule,
     NgxSpinnerModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    
     
   ],
   providers: [HttpClientModule, 
