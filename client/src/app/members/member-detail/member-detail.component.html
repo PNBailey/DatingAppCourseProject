@@ -14,11 +14,11 @@
                 </div>
                 <div>
                     <strong>Last active:</strong>
-                    <p>{{member.lastActive}}</p>
+                    <p>{{member.lastActive | timeago }}</p> <!--As we installed the ngx timeAgo package, we get access to this timeago pipe-->
                 </div>
                 <div>
                     <strong>Member since:</strong>
-                    <p>{{member.created}}</p>
+                    <p>{{member.created | date: 'dd MMMM yyyy' }}</p> <!--The pipe here changes the format of the date that is displayed-->
                 </div>
                 <div class="card-footer">
                     <div class="btn-group d-flex">
