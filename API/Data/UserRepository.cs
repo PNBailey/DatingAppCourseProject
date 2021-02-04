@@ -67,7 +67,7 @@ namespace API.Data
             return await PagedList<MemberDto>.CreateAsync(query.ProjectTo<MemberDto>(_mapper.ConfigurationProvider).AsNoTracking(), userParams.PageNumber, userParams.PageSize);  // We specify what type of PageList we want with the <MemberDto>. This means we want to return a PageList of MemberDto's. The query is the source data that the CreateAsync static method expects. So we get a PagedList ad then we create a PagedList using the parameters. This method
         }   
 
-        public async Task<AppUser> GetUserByIdAsync(int id)
+        public async Task<AppUser> GetUserByIdAsync(int id) // This method is more efficient when retrievig the user as the Id is indexed and if we don't need the photos, we should use this method to retrieve the users rather that getting user by username as we do below
         {
             return await _context.Users.FindAsync(id);
         }

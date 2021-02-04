@@ -1,3 +1,4 @@
+using API.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
 // We create a base class here so that we can derive other controller classes from it. This implements inheritance and DRY principles 
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     
+    [ServiceFilter(typeof(LogUserActivity))] // This is our action filter which will update our lastVisited user property 
     [ApiController] // 1. We have to add this attribute to our API controllers
     [Route("api/[controller]")] // 2. We also have to specify the route. 
     public class BaseApiController : ControllerBase // 3. controllers always inherit from the ControllerBase class 
