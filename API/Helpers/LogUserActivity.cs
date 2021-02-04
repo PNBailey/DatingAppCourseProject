@@ -17,11 +17,11 @@ namespace API.Helpers
 
             if(!resultContext.HttpContext.User.Identity.IsAuthenticated) return; // We want to see if the user is authenticated (user is logged in) as we don't want to perform these actions if there isn't a user that is logged in. If the user sent up a token and we've authenticated the user then the 'IsAuthenticated' will be true, otherwise it will be false. Here we check to see if the 'IsAuthenticated' is false 
 
-            var username = resultContext.HttpContext.User.GetUsername(); // This gets our username from the claims principle. The 'User' object here is a claims principle and we created the GetUserName claims principle extension method 
+            var userId = resultContext.HttpContext.User.GetUserId(); // This gets our username from the claims principle. The 'User' object here is a claims principle and we created the GetUserName claims principle extension method 
 
             var repo = resultContext.HttpContext.RequestServices.GetService<IUserRepository>();// We need to get access to our repository so to do this we can use our service locator pattern. We have to manually import the GetService method from 'using Microsoft.Extensions.DependencyInjection' as VS code doesn't auto import it 
 
-            var user = await repo.GetUserByUsernameAsync(username); 
+            var user = await repo.GetUserByIdAsync(userId); 
 
             user.LastActive = DateTime.Now;
 
