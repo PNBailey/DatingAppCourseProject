@@ -15,10 +15,16 @@ import { UserParams } from '../Models/userParams';
 export class MembersService {
   baseUrl = environment.apiUrl;
   members: Member[] = [];
+  memberCache = new Map(); // If we want to store something with a key and value, a good thing to use is a map. A map is like a dictionary. 
+
   constructor(private http: HttpClient) { }
 
   getMembers(userParams: UserParams) { // The ? here means that the page can be null
     // if(this.members.length > 0) return of(this.members); // In this getMembers method, we only want to retrieve the members from the database if we don't already have the members in our database. As our client is expecting an observable from this getMembers method, we need to return an observable which is why we use the of keyword. Of just means we are going to return something of an observable. It turns the return of the members into an observable so that when our member list component subscribes to it, it still works correctly.
+    var response = this.memberCache.get(Object.values(userParams).join('-')); // The Object.values we use here will create an array from the object you pass into it. We then join the arrays together with a - between them. The response here will be the key of our key value pair. So this is our key that we are trying to retrieve from the memberCache: 'Object.values(userParams).join('-')'. If the response that is retrieved here is identical to the userParams that is passed into the getMembers method then the below code will simply return the reponse as an observable because we don;t want to get our members if we have already retrieved them with the same userParams
+    if(response) { // If there is a response, this means that we already have our members so therefore we don;t need to go and get them again
+      return of(response); // If there is a response, we return it as an observable 
+    }
 
     let params = this.getPaginationHeaders(userParams.pageNumber, userParams.pageSize);
 
@@ -29,14 +35,37 @@ export class MembersService {
 
     
     
-    return this.getPaginatedResult<Member[]>(this.baseUrl + 'users', params);
+    return this.getPaginatedResult<Member[]>(this.baseUrl + 'users', params).pipe(map(response => {
+      this.memberCache.set(Object.values(userParams).join('-'), response); // The response from this is our paginated result. We use the response data (The members returned from the http request) here to set it in our memberCache Map property.
+      return response; // The response here is our members array 
+    }))
   }
 
   
 
   getMember(username: string) {
-    const member = this.members.find(x => x.userName === username);
-    if(member !== undefined) return of(member);
+    // for(let value of this.memberCache.values()) { // This was my attempt
+    //   for(let user of value.result) {
+    //     if(user.userName === username) {
+    //       return of(user);
+    //     }
+    //   }
+    // }
+    const member = [...this.memberCache.values()] // This is the instructors attempt. We use the spread operator to put the paginated results from the values retrieved from our memberCache
+    .reduce((arr, elem) => arr.concat(elem.result), []) // We then use the reduce method (call back function) on the above member (now) array to reduce our array into something else. We just want the results of each array in a single array that we can search to find the first member that has the same username that is passed into this method. This reduce method is caled for every element in the member array. The 'arr' argument is the previous value (the previous). The 'elem' is our current value. The empty [] is the initial value. So we are concatinating the previous value (arr, which initially is set to an empty array) with the current value (elem.result). This will flatten the array into one array which is an array of member objects
+
+    .find((member: Member) => member.userName === username); // This iterates over every member in the flattened array and returns the member if the userName is equal to the username passed into the getMember method 
+
+    if(member) {
+      return of(member);
+    }
+
+
+
+
+
+    
+
     return this.http.get<Member>(this.baseUrl + 'users/' + username);
   }
 

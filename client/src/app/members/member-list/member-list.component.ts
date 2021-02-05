@@ -38,7 +38,6 @@ export class MemberListComponent implements OnInit {
     this.memberService.getMembers(this.userParams).subscribe(response => {
       this.members = response.result; // As we now include the full response with the http request, we have to access the result from the response
       this.pagination = response.pagination;
-      console.log(this.pagination);
     })
   }
 
