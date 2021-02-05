@@ -20,11 +20,8 @@ export class MemberListComponent implements OnInit {
   user: User;
   genderList = [{value: 'male', display: 'Males'}, {value: 'female', display: 'Females'}]; // We create an array of objects which will be used in our html file of this component 
 
-  constructor(private memberService: MembersService, private accountService: AccountService) { 
-    this.accountService.currentUser$.pipe(take(1)).subscribe(user => {
-      this.user = user;
-      this.userParams = new UserParams(user);
-    })
+  constructor(private memberService: MembersService) { 
+    this.userParams = this.memberService.getUserParams();
   }
 
   ngOnInit(): void {
@@ -35,6 +32,7 @@ export class MemberListComponent implements OnInit {
   }
 
   loadMembers() {
+    this.memberService.setUserParams(this.userParams);
     this.memberService.getMembers(this.userParams).subscribe(response => {
       this.members = response.result; // As we now include the full response with the http request, we have to access the result from the response
       this.pagination = response.pagination;
@@ -42,12 +40,13 @@ export class MemberListComponent implements OnInit {
   }
 
   resetFilters() { // This ill reset our filters and will reload our members based on our default userParams (the default userParam values are set in our UserParams class in our API)
-    this.userParams = new UserParams(this.user);
+    this.userParams = this.memberService.resetUserParams();
     this.loadMembers();
   }
 
   pageChanged(event: any){
      this.userParams.pageNumber = event.page;
+     this.memberService.setUserParams(this.userParams);
      this.loadMembers();
   }
 

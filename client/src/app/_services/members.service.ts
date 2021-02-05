@@ -1,11 +1,13 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Member } from '../Models/member';
 import { PaginatedResult } from '../Models/pagination';
+import { User } from '../Models/user';
 import { UserParams } from '../Models/userParams';
+import { AccountService } from './account.service';
 
 
 @Injectable({
@@ -15,9 +17,29 @@ import { UserParams } from '../Models/userParams';
 export class MembersService {
   baseUrl = environment.apiUrl;
   members: Member[] = [];
-  memberCache = new Map(); // If we want to store something with a key and value, a good thing to use is a map. A map is like a dictionary. 
+  memberCache = new Map(); // If we want to store something with a key and value, a good thing to use is a map. A map is like a dictionary.
+  user: User; 
+  userParams: UserParams;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private accountService: AccountService) {
+    this.accountService.currentUser$.pipe(take(1)).subscribe(user => {
+      this.user = user;
+      this.userParams = new UserParams(user);
+    })
+   }
+
+   getUserParams() {
+     return this.userParams;
+   }
+
+   setUserParams(params: UserParams) {
+     this.userParams = params;
+   }
+
+   resetUserParams() {
+     this.userParams = new UserParams(this.user);
+     return this.userParams;
+   }
 
   getMembers(userParams: UserParams) { // The ? here means that the page can be null
     // if(this.members.length > 0) return of(this.members); // In this getMembers method, we only want to retrieve the members from the database if we don't already have the members in our database. As our client is expecting an observable from this getMembers method, we need to return an observable which is why we use the of keyword. Of just means we are going to return something of an observable. It turns the return of the members into an observable so that when our member list component subscribes to it, it still works correctly.
@@ -60,11 +82,6 @@ export class MembersService {
       return of(member);
     }
 
-
-
-
-
-    
 
     return this.http.get<Member>(this.baseUrl + 'users/' + username);
   }
