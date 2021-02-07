@@ -17,6 +17,29 @@ namespace API.Data // This should match the folder paths
 
         public DbSet<AppUser> Users { get; set; } // We add a DbSet. We pass in the type that we want to create a database set for (in this case Users). The Users we specify here is the table we are calling. We then need to add this configuration to our starter class so we can inject the data context into other parts of our app 
 
+        public DbSet<UserLike> Likes { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder) // As we need to do something with our Likes, we need to do some configuration. Here we are overriding the DbContext method 'OnModelCreating'. Using override allows us to override an inhereted method 
+        {
+            base.OnModelCreating(builder); // If we don;t do this, we can sometimes get errors when we try and add a migration. We get access to the 'base' when we are overriding a method
+
+            builder.Entity<UserLike>() // This allows us to 'work' on our entity here. We pass in the entity as a type parameter of the entity we want to configure 
+                .HasKey(key => new {key.SourceUserId, key.LikedUserId}); // Because we didn't identify a primary key for this particular entity, we are going to configure this key ourself. It's going to be a combination of the source user id and the liked user id. So if the SourceUserId (the one that has done the 'liking') is '27' and the LikedUserId is '34', then the like is will be '27 34'
+
+            builder.Entity<UserLike>() // This configures the relationships
+                .HasOne(s => s.SourceUser) // A source user can like many other users is what we are saying/configuring here
+                .WithMany(l => l.LikedUsers)
+                .HasForeignKey(s => s.SourceUserId)
+                .OnDelete(DeleteBehavior.Cascade); // This means that is we delete the user, we delete the related entities (i.e. if we delete a user, we delete their likes)
+
+            builder.Entity<UserLike>() // This configures the relationships
+                .HasOne(s => s.LikedUser) // A liked user can be liked by many other users (source users , see above) is what we are saying/configuring here
+                .WithMany(l => l.LikedByUsers)
+                .HasForeignKey(s => s.LikedUserId)
+                .OnDelete(DeleteBehavior.Cascade); // This means that is we delete the user, we delete the related entities (i.e. if we delete a user, we delete their likes)
+             
+        }
+
         
         
     }

@@ -37,10 +37,8 @@ namespace API.Entities
 
            public ICollection<Photo> Photos { get; set; } // This is the relationship between our AppUser entity and our Photo entity. This is a one to many relationship
 
-        //    public int GetAge() { // The name of this method is important. The Get part of it is neccessary because automapper will automatically calculate the age of the user when we add Age as a property in the Member Dto and we then convert the AppUser to a Member Dto using automapper. This works as automapper is clever enough the see the Age text here and see the Get prefix
-        //        return DateOfBirth.CalculateAge();
-        //    }
+           public ICollection<UserLike> LikedByUsers { get; set; } // We add this to enable the many to many relationship needed for our UserLike entity. This is the users who have liked the curretly logged in user
 
-        // **Rathe than use this method above (as it is not very efficient), we add the age calculation (from the api extension method we created) indside of our CreatMap within the AutoMapper profile class 
+           public ICollection<UserLike> LikedUsers { get; set; } // This is the users that the currently logged in user has liked 
     }
 }
