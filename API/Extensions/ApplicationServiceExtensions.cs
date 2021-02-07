@@ -24,6 +24,8 @@ namespace API.Extensions
 
             services.AddScoped<LogUserActivity>();
 
+            services.AddScoped<ILikesRepository, LikesRepository>();
+
             services.AddScoped<IUserRepository, UserRepository>();
 
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly); // We must also tell the AutoMapper where the profiles are located in our project. This is enough for automapper to go ahead and find those profiles (CreateMaps) we created there. 
