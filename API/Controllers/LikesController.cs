@@ -24,13 +24,7 @@ namespace API.Controllers
 
         public async Task<ActionResult> AddLike(string username)
         {
-            // var likedUser = await _userRepository.GetUserByUsernameAsync(username);
-            // var likedUserId = likedUser.Id;
-            // var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-            // var userId = user.Id;
-
-            // likedUser.LikedByUsers.Add(likedUser, likedUserId, user, userId);
-
+        
             var sourceUserId = User.GetUserId();
             var likedUser = await _userRepository.GetUserByUsernameAsync(username);
             var sourceUser = await _likesRepository.GetUserWithLikes(sourceUserId);
@@ -39,13 +33,13 @@ namespace API.Controllers
 
             if(sourceUser.UserName == username) return BadRequest("you cannot like yourself");
 
-            var userLike = await _likesRepository.GetUserLike(sourceUserId, likedUser.Id);
+            var userLike = await _likesRepository.GetUserLike(sourceUserId, likedUser.Id); // if the userlike is not found here then that means the user hasn't already been liked by the logged user 
 
             if(userLike != null) return BadRequest("You already liked this user");
 
             userLike = new UserLike
             {
-                SourceUserId = sourceUserId, // We onyl need to add this two properties to our UserLike entity as this is the only two columns we have 
+                SourceUserId = sourceUserId, // We only need to add this two properties to our UserLike entity as this is the only two columns we have 
                 LikedUserId = likedUser.Id
             };
 

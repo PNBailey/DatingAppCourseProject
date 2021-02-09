@@ -105,6 +105,14 @@ export class MembersService {
     return this.http.delete(this.baseUrl + 'users/delete-photo/' + photoId);
   }
 
+  addLike(username: string) {
+    return this.http.post(this.baseUrl + 'likes/' + username, {}) // Because this is a post request, we have to add the body of the request so we add an empty object {}.
+  }
+
+  getLikes(predicate: string) {
+    return this.http.get(`${this.baseUrl}likes?=${predicate}`); //The predicate will either be 'liked' or 'likedBy' which will determine whether we want to retrieve the liked users or the users that have liked the logged in user
+  }
+
   private getPaginatedResult<T>(url, params) { // We set the type of this method to a generic type using the T 
     const paginatedResult: PaginatedResult<T> = new PaginatedResult<T>();
     return this.http.get<T>(url, { observe: 'response', params }).pipe(
