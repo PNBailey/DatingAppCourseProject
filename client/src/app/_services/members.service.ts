@@ -83,7 +83,7 @@ export class MembersService {
     }
 
 
-    return this.http.get<Member>(this.baseUrl + 'users/' + username);
+    return this.http.get<Member>(`${this.baseUrl}users/${username}`);
   }
 
   updateMember(member: Member) { // In this method, we are returning the members array which is wrapped in the Observable. As we amend the member-list component, it is now expecting an Observable which returns a members array. As we are subscribing to the Observable, we are receiving the data which is wrapped in the Observable. The data that is 'mapped' in the Observable doesn't necessarily have to be data which is coming from the server, it can be data which is stored locally as well
@@ -110,7 +110,7 @@ export class MembersService {
   }
 
   getLikes(predicate: string) {
-    return this.http.get(`${this.baseUrl}likes?=${predicate}`); //The predicate will either be 'liked' or 'likedBy' which will determine whether we want to retrieve the liked users or the users that have liked the logged in user
+    return this.http.get<Partial<Member[]>>(`${this.baseUrl}likes?predicate=${predicate}`); //The predicate will either be 'liked' or 'likedBy' which will determine whether we want to retrieve the liked users or the users that have liked the logged in user
   }
 
   private getPaginatedResult<T>(url, params) { // We set the type of this method to a generic type using the T 
