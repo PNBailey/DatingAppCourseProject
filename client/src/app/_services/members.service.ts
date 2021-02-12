@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { of } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { LikesParams } from '../Models/likesParams';
 import { Member } from '../Models/member';
 import { PaginatedResult } from '../Models/pagination';
 import { User } from '../Models/user';
@@ -109,8 +110,12 @@ export class MembersService {
     return this.http.post(this.baseUrl + 'likes/' + username, {}) // Because this is a post request, we have to add the body of the request so we add an empty object {}.
   }
 
-  getLikes(predicate: string) {
-    return this.http.get<Partial<Member[]>>(`${this.baseUrl}likes?predicate=${predicate}`); //The predicate will either be 'liked' or 'likedBy' which will determine whether we want to retrieve the liked users or the users that have liked the logged in user
+  getLikes(likesParams: LikesParams) {
+    let params = this.getPaginationHeaders(likesParams.pageNumber, likesParams.pageSize);
+
+    params = params.append('predicate', likesParams.predicate);
+
+    return this.getPaginatedResult<Partial<Member[]>>(`${this.baseUrl}likes`, params); //The predicate will either be 'liked' or 'likedBy' which will determine whether we want to retrieve the liked users or the users that have liked the logged in user
   }
 
   private getPaginatedResult<T>(url, params) { // We set the type of this method to a generic type using the T 
