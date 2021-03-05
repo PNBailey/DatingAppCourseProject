@@ -107,7 +107,7 @@ export class MembersService {
   }
 
   addLike(username: string) {
-    return this.http.post(this.baseUrl + 'likes/' + username, {}) // Because this is a post request, we have to add the body of the request so we add an empty object {}.
+    return this.http.post(this.baseUrl + 'likes/' + username, {}); // Because this is a post request, we have to add the body of the request so we add an empty object {}.
   }
 
   getLikes(likesParams: LikesParams) {

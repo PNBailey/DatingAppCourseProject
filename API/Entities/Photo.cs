@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace API.Entities
 {
 
-    [Table("Photos")] // When entity framework creates this tabel, it will be called Photos. We don't add this to the DBContext dervied class but the table will still be added to the database when we migrate as we have used this attribute
+    [Table("Photos")] // When entity framework creates this table, it will be called Photos. We don't add this to the DBContext derived class but the table will still be added to the database when we migrate as we have used this attribute
     public class Photo
     {
         public int Id { get; set; }

@@ -36,7 +36,7 @@ export class ErrorInterceptor implements HttpInterceptor {
 
               this.toastr.error(error.statusText, error.status); // If there is no error in the errors array that comes from our api, then the error can be handled by the toastr
             } else {
-              this.toastr.error(error.error, error.status);
+              this.toastr.error(error.statusText, error.status);
               
             }
              break;
