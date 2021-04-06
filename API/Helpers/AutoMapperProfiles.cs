@@ -18,6 +18,10 @@ namespace API.Helpers
             CreateMap<MemberUpdateDto, AppUser>(); // As we want to map our updated member when the user updates their profile, we need to build this into our automapper
 
             CreateMap<RegisterDto, AppUser>();
+
+            CreateMap<Message, MessageDto>()
+                .ForMember(dest => dest.SenderPhotoUrl, opt => opt.MapFrom(src => src.Sender.Photos.FirstOrDefault(x => x.IsMain).Url)) // As the photo for the sender will not be automatically mapped, we need to add some configuration to get the url from the image which is marked as the main photo in the senders photos
+                .ForMember(dest => dest.RecipientPhotoUrl, opt => opt.MapFrom(src => src.Recipient.Photos.FirstOrDefault(x => x.IsMain).Url)); 
         }
 
         // As we want to add this as a dependancy that we can inject, we need to add it to our applicationservice extensions

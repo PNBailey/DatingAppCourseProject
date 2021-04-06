@@ -40,5 +40,9 @@ namespace API.Entities
            public ICollection<UserLike> LikedByUsers { get; set; } // We add this to enable the many to many relationship needed for our UserLike entity. This is the users who have liked the curretly logged in user. Using the Icollection interface gives us access to methods like .Add and .Contains on the LikedbyUsers
 
            public ICollection<UserLike> LikedUsers { get; set; } // This is the users that the currently logged in user has liked. Using the Icollection interface gives us access to methods like .Add and .Contains on the Likedusers
+
+            public ICollection<Message> MessagesSent { get; set; }
+
+            public ICollection<Message> MessagesReceived { get; set; }
     }
 }
