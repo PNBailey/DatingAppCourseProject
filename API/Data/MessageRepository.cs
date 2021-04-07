@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using API.Helpers;
 using API.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
@@ -55,9 +57,34 @@ namespace API.Data
 
         }
 
-        public Task<IEnumerable<MessageDto>> GetMessageThread(int currentUserID, int recipientId)
+        public async Task<IEnumerable<MessageDto>> GetMessageThread(string currentUsername, string recipientUsername)
         {
-            throw new System.NotImplementedException();
+            var messages = await _context.Messages
+                .Include(u => u.Sender).ThenInclude(p => p.Photos) // Using the include statement meas that whatever passed into the include method will be 'eagerly loaded'
+                .Include(u => u.Recipient).ThenInclude(p => p.Photos) 
+                .Where(m => m.Recipient.UserName == currentUsername
+                    && m.Sender.UserName == recipientUsername
+                    || m.Recipient.UserName == recipientUsername
+                    && m.Sender.UserName == currentUsername
+                )
+                .OrderBy(m => m.MessageSent)
+                .ToListAsync(); // We convert the messages to a list so that we can work with them below and change the DateRead property
+
+            var unreadMessages = messages.Where(m => m.DateRead == null && m.Recipient.UserName == currentUsername).ToList();
+
+            if(unreadMessages.Any()) // This tests whether there are any unreadMessages in the list above 
+            {
+                foreach(var message in unreadMessages) 
+                {
+                    message.DateRead = DateTime.Now;
+                }
+
+                await _context.SaveChangesAsync();
+
+            }
+              
+                return _mapper.Map<IEnumerable<MessageDto>>(messages);
+            
         }
 
         public async Task<bool> SaveAllAsync()
