@@ -16,4 +16,8 @@ export class MessageService {
     params = params.append('Container', container); // We append the query params so that we can change what's being requested from the api
     return getPaginatedResult<Message[]>(this.baseUrl + 'messages', params, this.http);
   }
+
+  getMessageThread(username: string) {
+  return this.http.get<Message[]>(this.baseUrl + 'messages/thread/' + username);
+  }
 }
