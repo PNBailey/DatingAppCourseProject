@@ -9,6 +9,7 @@ import { PaginatedResult } from '../Models/pagination';
 import { User } from '../Models/user';
 import { UserParams } from '../Models/userParams';
 import { AccountService } from './account.service';
+import { getPaginatedResult, getPaginationHeaders } from './paginationHelper';
 
 
 @Injectable({
@@ -49,7 +50,7 @@ export class MembersService {
       return of(response); // If there is a response, we return it as an observable 
     }
 
-    let params = this.getPaginationHeaders(userParams.pageNumber, userParams.pageSize);
+    let params = getPaginationHeaders(userParams.pageNumber, userParams.pageSize); // The getPaginationHeaders method is in the paginationHelpers .ts file. This function is exported from this file.
 
     params = params.append('minAge', userParams.minAge.toString());
     params = params.append('maxAge', userParams.maxAge.toString());
@@ -58,8 +59,8 @@ export class MembersService {
 
     
     
-    return this.getPaginatedResult<Member[]>(this.baseUrl + 'users', params).pipe(map(response => {
-      this.memberCache.set(Object.values(userParams).join('-'), response); // The response from this is our paginated result. We use the response data (The members returned from the http request) here to set it in our memberCache Map property.
+    return getPaginatedResult<Member[]>(this.baseUrl + 'users', params, this.http).pipe(map(response => {
+      this.memberCache.set(Object.values(userParams).join('-'), response); // The response from this is our paginated result. We use the response data (The members returned from the http request) here to set it in our memberCache Map property. The getPaginatedResult method is in the paginationHelpers .ts file. This function is exported from this file.
       return response; // The response here is our members array 
     }))
   }
@@ -111,36 +112,13 @@ export class MembersService {
   }
 
   getLikes(likesParams: LikesParams) {
-    let params = this.getPaginationHeaders(likesParams.pageNumber, likesParams.pageSize);
+    let params = getPaginationHeaders(likesParams.pageNumber, likesParams.pageSize); // The getPaginationHeaders method is in the paginationHelpers .ts file. This function is exported from this file.
 
     params = params.append('predicate', likesParams.predicate);
 
-    return this.getPaginatedResult<Partial<Member[]>>(`${this.baseUrl}likes`, params); //The predicate will either be 'liked' or 'likedBy' which will determine whether we want to retrieve the liked users or the users that have liked the logged in user
+    return getPaginatedResult<Partial<Member[]>>(`${this.baseUrl}likes`, params, this.http); //The predicate will either be 'liked' or 'likedBy' which will determine whether we want to retrieve the liked users or the users that have liked the logged in user. The getPaginatedResult method is in the paginationHelpers .ts file. This function is exported from this file.
   }
 
-  private getPaginatedResult<T>(url, params) { // We set the type of this method to a generic type using the T 
-    const paginatedResult: PaginatedResult<T> = new PaginatedResult<T>();
-    return this.http.get<T>(url, { observe: 'response', params }).pipe(
-      map(response => {
-        paginatedResult.result = response.body; // This is where our members array will be contained
-        if (response.headers.get('Pagination') !== null) {
-          paginatedResult.pagination = JSON.parse(response.headers.get('Pagination'));
-        }
-        return paginatedResult;
-      })
-
-    );
-  }
-
-  private getPaginationHeaders(pageNumber: number, pageSize: number) {
-    let params = new HttpParams(); // This gives us the ability to serialize our parameters. This will take care of adding this onto our query string. 
-
-      params = params.append('pageNumber', pageNumber.toString()); // as the page needs to be a query string we need to convert the page from a number to a string 
-      params = params.append('pageSize', pageSize.toString());
-
-      return params;
-    
-  }
-
+  
 
 }
