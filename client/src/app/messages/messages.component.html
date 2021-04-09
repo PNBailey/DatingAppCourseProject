@@ -26,9 +26,9 @@
             <th style="width: 20%">Sent / Received</th>
             <th style="width: 20%">Message</th>
         </tr>
-        <tr *ngFor="let message of messages" 
+        <tr [hidden]="loading" *ngFor="let message of messages" 
         routerLink='{{container === "Outbox" ? "/members/" + message.recipientUsername : "/members/" + message.senderUsername}}' [queryParams]='{tab: 3}'>
-        <td>{{message.content}}</td>
+        <td>{{message.content}}</td> <!--Using the [hidden] attribute and binding to it means that when the loading flag in the component file is set to true, this elements will be hidden and when it is set to false, it will show-->
         <td>
             <div *ngIf="container === 'Outbox'">
                 <img
@@ -47,13 +47,13 @@
         </td>
         <td>{{message.messageSent | timeago}}</td>
         <td>
-            <button class="btn btn-danger">Delete</button>
+            <button (click)="$event.stopPropagation()" (click)="deleteMessage(message.id)" class="btn btn-danger">Delete</button> <!--Using the $event.stopPropagation will prevent angular from routing the user when they click on the delete button. The routerLink on the <tr tag above encompasses this button so the routerLink would otherwise include this button-->
         </td>
         </tr>
     </table>
 </div>
 
-<div class="d-flex justify-content-center" *ngIf="pagination">
+<div class="d-flex justify-content-center" *ngIf="pagination && !loading">
     <pagination
       [boundaryLinks]="true"
       [totalItems]="pagination.totalItems"

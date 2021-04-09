@@ -35,7 +35,12 @@ namespace API.Data
 
         public async Task<Message> GetMessage(int id)
         {
-            return await _context.Messages.FindAsync(id);
+             return await _context.Messages
+            .Include(m => m.Recipient)
+            .Include(m => m.Sender)
+            .SingleOrDefaultAsync(m => m.Id == id);
+
+            
         }
 
         public async Task<PagedList<MessageDto>> GetMessagesForUser(MessageParams messageParams)
@@ -46,9 +51,9 @@ namespace API.Data
 
             query = messageParams.Container switch // this adds a switch statement based on the container
             {
-                "Inbox" => query.Where(u => u.Recipient.Username == messageParams.Username),
-                "Outbox" => query.Where(u => u.Sender.Username == messageParams.Username),
-                _ => query.Where(u => u.Recipient.Username == messageParams.Username && u.DateRead == null) // The _ is the default option in the switch statement. So here if 'Inbox' and 'Outbox' are not specified, the _option will be used. This will return all the received messages which haven't been read (where the DateRead is null)
+                "Inbox" => query.Where(u => u.Recipient.Username == messageParams.Username && u.RecipientDeleted == false),
+                "Outbox" => query.Where(u => u.Sender.Username == messageParams.Username && u.SenderDeleted == false),
+                _ => query.Where(u => u.Recipient.Username == messageParams.Username && u.RecipientDeleted == false && u.DateRead == null) // The _ is the default option in the switch statement. So here if 'Inbox' and 'Outbox' are not specified, the _option will be used. This will return all the received messages which haven't been read (where the DateRead is null)
             };
             
             var messages = query.ProjectTo<MessageDto>(_mapper.ConfigurationProvider);
@@ -63,9 +68,11 @@ namespace API.Data
                 .Include(u => u.Sender).ThenInclude(p => p.Photos) // Using the include statement meas that whatever passed into the include method will be 'eagerly loaded'
                 .Include(u => u.Recipient).ThenInclude(p => p.Photos) 
                 .Where(m => m.Recipient.Username == currentUsername
+                    && m.RecipientDeleted == false
                     && m.Sender.Username == recipientUsername
                     || m.Recipient.Username == recipientUsername
-                    && m.Sender.Username == currentUsername
+                    && m.Sender.Username == currentUsername 
+                    && m.SenderDeleted == false
                 )
                 .OrderBy(m => m.MessageSent)
                 .ToListAsync(); // We convert the messages to a list so that we can work with them below and change the DateRead property
