@@ -10,7 +10,7 @@ namespace API.DTOs
 
         [Required] // To prevent blank usernames etc, we need to add validation. We could add the data validation at many different levels on our app (in the appsure class, entity class etc) but we will add it in our DTO’s as these are the properties we are receiving in the body of our request. The api controller contains some automated validation checks that we can utilise. It automatically validates the parameters that we pass up to an API endpoint based on the validation we set. To use validation. In this DTO class, we use the [Required] data annotation to ensure this value is actually used. If it is not used or it is an empty string, it returns a 400 error with the error message "The username field is required"
 
-       public string UserName { get; set; }
+       public string Username { get; set; }
 
         [Required] public string KnownAs { get; set; }
 

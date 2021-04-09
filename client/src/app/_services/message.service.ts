@@ -20,4 +20,8 @@ export class MessageService {
   getMessageThread(username: string) {
   return this.http.get<Message[]>(this.baseUrl + 'messages/thread/' + username);
   }
+
+  sendMessage(username: string, content: string) {
+    return this.http.post<Message>(this.baseUrl + 'messages', {recipientUsername: username, content}); // If the name of the property we are passing in is exactly the same as what the CreateMessageDto expects on the api, we don't need to specify the value, we can just leave it as content
+  }
 }

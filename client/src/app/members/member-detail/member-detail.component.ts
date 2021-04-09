@@ -23,7 +23,10 @@ export class MemberDetailComponent implements OnInit {
   constructor(private memberService: MembersService, private route: ActivatedRoute, private messageService: MessageService) { }
 
   ngOnInit(): void {
-    this.loadMember();
+    // this.loadMember(); // As we are now using a resolver, we get the member from the route.data below
+    this.route.data.subscribe(data => {
+      this.member = data.member;
+    })
 
     this.route.queryParams.subscribe(params => {  // as wwe are passing the query params along with the route, to this page when the messages icon is clicked, we can get access to the queryparams from the injected ActivatedRoute
       params.tab ? this.selectTab(params.tab) : this.selectTab(0);
@@ -40,6 +43,8 @@ export class MemberDetailComponent implements OnInit {
         preview: false
       }
     ]
+
+    this.galleryImages = this.getImages();
     
   }
 
@@ -57,14 +62,13 @@ export class MemberDetailComponent implements OnInit {
 
   loadMember() {
     this.memberService.getMember(this.route.snapshot.paramMap.get('username')).subscribe(member => {
-      this.member = member;
-      this.galleryImages = this.getImages();
+      this.member = member;   
     })
   }
 
   loadMessages() {
     console.log("hi");
-    this.messageService.getMessageThread(this.member.userName).subscribe(messages => {
+    this.messageService.getMessageThread(this.member.username).subscribe(messages => {
       this.messages = messages;
     });
   }

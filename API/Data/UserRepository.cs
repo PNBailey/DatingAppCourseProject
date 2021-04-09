@@ -26,7 +26,7 @@ namespace API.Data
         public async Task<MemberDto> GetMemberAsync(string username) // We create this method as rather than getting all the users from the database and then finding the correct user, it would be more optimal to find the user at the database level and then simply returning that user as a Member Dto
         {
             return await _context.Users
-            .Where(x => x.UserName == username) // We use the Where linq method as this will return the user which has the matched username that we pass into this method. This is more effecient thatn just getting all the users from the database and then finding each user 
+            .Where(x => x.Username == username) // We use the Where linq method as this will return the user which has the matched username that we pass into this method. This is more effecient thatn just getting all the users from the database and then finding each user 
             // .Select(user => new MemberDto { // The select method allows us to select a user from the database and then create a new class using the user when it comes back from our database
             //     Id = user.Id,
             //     UserName = user.UserName
@@ -47,7 +47,7 @@ namespace API.Data
             // .AsNoTracking() // In entity framework, when we go an get entities, Entity framework applies tracking to these entities. Becuase this is going to be a list that we only ever read from, we use the AsNoTracking to prevent the tracking on the entity 
             // .AsQueryable(); // This gives us an oppurtunity to do something with this query (e.g. what we want to filter by for instance)
 
-            query = query.Where(user => user.UserName != userParams.CurrentUserName); // This filters out 
+            query = query.Where(user => user.Username != userParams.CurrentUserName); // This filters out 
             query = query.Where(user => user.Gender == userParams.Gender);
 
             var minDob = DateTime.Today.AddYears(-userParams.MaxAge - 1); // We use the -1 so that we give the accurate year. So here we minus the MaxAge (which is just a number) from Todays date. The gives us the minDob date that we need to specify in our Where method below
@@ -76,7 +76,7 @@ namespace API.Data
         {
             return await _context.Users
             .Include(p => p.Photos)
-            .SingleOrDefaultAsync(x => x.UserName == username);
+            .SingleOrDefaultAsync(x => x.Username == username);
         }
 
         public async Task<IEnumerable<AppUser>> GetUsersAsync()

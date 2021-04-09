@@ -46,9 +46,9 @@ namespace API.Data
 
             query = messageParams.Container switch // this adds a switch statement based on the container
             {
-                "Inbox" => query.Where(u => u.Recipient.UserName == messageParams.Username),
-                "Outbox" => query.Where(u => u.Sender.UserName == messageParams.Username),
-                _ => query.Where(u => u.Recipient.UserName == messageParams.Username && u.DateRead == null) // The _ is the default option in the switch statement. So here if 'Inbox' and 'Outbox' are not specified, the _option will be used. This will return all the received messages which haven't been read (where the DateRead is null)
+                "Inbox" => query.Where(u => u.Recipient.Username == messageParams.Username),
+                "Outbox" => query.Where(u => u.Sender.Username == messageParams.Username),
+                _ => query.Where(u => u.Recipient.Username == messageParams.Username && u.DateRead == null) // The _ is the default option in the switch statement. So here if 'Inbox' and 'Outbox' are not specified, the _option will be used. This will return all the received messages which haven't been read (where the DateRead is null)
             };
             
             var messages = query.ProjectTo<MessageDto>(_mapper.ConfigurationProvider);
@@ -62,15 +62,15 @@ namespace API.Data
             var messages = await _context.Messages
                 .Include(u => u.Sender).ThenInclude(p => p.Photos) // Using the include statement meas that whatever passed into the include method will be 'eagerly loaded'
                 .Include(u => u.Recipient).ThenInclude(p => p.Photos) 
-                .Where(m => m.Recipient.UserName == currentUsername
-                    && m.Sender.UserName == recipientUsername
-                    || m.Recipient.UserName == recipientUsername
-                    && m.Sender.UserName == currentUsername
+                .Where(m => m.Recipient.Username == currentUsername
+                    && m.Sender.Username == recipientUsername
+                    || m.Recipient.Username == recipientUsername
+                    && m.Sender.Username == currentUsername
                 )
                 .OrderBy(m => m.MessageSent)
                 .ToListAsync(); // We convert the messages to a list so that we can work with them below and change the DateRead property
 
-            var unreadMessages = messages.Where(m => m.DateRead == null && m.Recipient.UserName == currentUsername).ToList();
+            var unreadMessages = messages.Where(m => m.DateRead == null && m.Recipient.Username == currentUsername).ToList();
 
             if(unreadMessages.Any()) // This tests whether there are any unreadMessages in the list above 
             {

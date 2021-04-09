@@ -78,7 +78,7 @@ export class MembersService {
     const member = [...this.memberCache.values()] // This is the instructors attempt. We use the spread operator to put the paginated results from the values retrieved from our memberCache
     .reduce((arr, elem) => arr.concat(elem.result), []) // We then use the reduce method (call back function) on the above member (now) array to reduce our array into something else. We just want the results of each array in a single array that we can search to find the first member that has the same username that is passed into this method. This reduce method is caled for every element in the member array. The 'arr' argument is the previous value (the previous). The 'elem' is our current value. The empty [] is the initial value. So we are concatinating the previous value (arr, which initially is set to an empty array) with the current value (elem.result). This will flatten the array into one array which is an array of member objects
 
-    .find((member: Member) => member.userName === username); // This iterates over every member in the flattened array and returns the member if the userName is equal to the username passed into the getMember method 
+    .find((member: Member) => member.username === username); // This iterates over every member in the flattened array and returns the member if the userName is equal to the username passed into the getMember method 
 
     if(member) {
       return of(member);
