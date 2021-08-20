@@ -51,7 +51,7 @@ namespace API.Controllers
 
         var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 
-            userParams.CurrentUserName = user.Username;
+            userParams.CurrentUserName = user.UserName;
 
             if(string.IsNullOrEmpty(userParams.Gender))
                 userParams.Gender = user.Gender == "male" ? "female" : "male";
@@ -130,7 +130,7 @@ namespace API.Controllers
             if(await _userRepository.SaveAllAsync()) {
                 // return _mapper.Map<Photo, PhotoDto>(photo); // We map our photo to our photo dto as we only want to return our Photo Dto properties rather than our full Photo object  
 
-                return CreatedAtRoute("GetUser", new {username = user.Username}, _mapper.Map<Photo, PhotoDto>(photo)); // The correct response type from the server when a resource is created (when a photo is added for example) is a 201 response. The 201 response includes a location header. To manually set a 201 response type we use the Created keyword. The "GetUser" is the route name we speficied in our GetUser endpoint. We specify this route as this is how we get the user (this is the only way to get the photos) which contains the photos. We provide the username as an object as this is what the GetUser endpoint expects. Using this CreatedAtRoute means that when the 201 response comes back, it is able to get the location of the photo. So the location will be "https://localhost:5001/api/Users/cecilia" for example. So the response that the client receives will now include the locatio of the image as we have amended the type of response to a 201 which includes the location in the header
+                return CreatedAtRoute("GetUser", new {username = user.UserName}, _mapper.Map<Photo, PhotoDto>(photo)); // The correct response type from the server when a resource is created (when a photo is added for example) is a 201 response. The 201 response includes a location header. To manually set a 201 response type we use the Created keyword. The "GetUser" is the route name we speficied in our GetUser endpoint. We specify this route as this is how we get the user (this is the only way to get the photos) which contains the photos. We provide the username as an object as this is what the GetUser endpoint expects. Using this CreatedAtRoute means that when the 201 response comes back, it is able to get the location of the photo. So the location will be "https://localhost:5001/api/Users/cecilia" for example. So the response that the client receives will now include the locatio of the image as we have amended the type of response to a 201 which includes the location in the header
 
             }
                 

@@ -47,15 +47,16 @@ namespace API.Controllers
             var user = _mapper.Map<AppUser>(registerDto);
 
 
-            using var hmac = new HMACSHA512(); // This provides us with our hashing algorithm that we are going to use to create a password hash. The using statement ensures when we are finished with this class, it will be dispsed of correctly. Anytime we are using a class with this using statement, it's going to call a method inside this class called 'dispose', so that is disposes of this as it should do. Any class that implements the dispose method will implement something called, the Idisposable interface. Any class that implements the Idisposable interface, has to provide this dispose method. The using method takes care of all this, it automatically disposes of the class.
+            // using var hmac = new HMACSHA512(); // This provides us with our hashing algorithm that we are going to use to create a password hash. The using statement ensures when we are finished with this class, it will be dispsed of correctly. Anytime we are using a class with this using statement, it's going to call a method inside this class called 'dispose', so that is disposes of this as it should do. Any class that implements the dispose method will implement something called, the Idisposable interface. Any class that implements the Idisposable interface, has to provide this dispose method. The using method takes care of all this, it automatically disposes of the class. *** As we are now using the Identity Framework, we no longer need to use the hashing algorithm
 
           
-                user.Username = registerDto.Username.ToLower(); // We want our username to be unique in our database. We are going to use our username for many different things so we want it to be unique. We create a private helper method in this class. See UserExists method below...
+                user.UserName = registerDto.Username.ToLower(); // We want our username to be unique in our database. We are going to use our username for many different things so we want it to be unique. We create a private helper method in this class. See UserExists method below...
 
 
-                user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)); // This creates a password hash using the HMACSHA512 class. This method takes a byte array as a parameter. As the password we pass in to this register method is a string, we need to make this into a byte array. This is why we use the 'hmac.ComputeHash(Encoding.UTF8.GetBytes(password))' to convert the string password that is passed into the register method into a byte array. The PasswordHash property from the Appuser expects a byte array so it is fine to pass this to the PasswordHash field. 
+                // user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)); // This creates a password hash using the HMACSHA512 class. This method takes a byte array as a parameter. As the password we pass in to this register method is a string, we need to make this into a byte array. This is why we use the 'hmac.ComputeHash(Encoding.UTF8.GetBytes(password))' to convert the string password that is passed into the register method into a byte array. The PasswordHash property from the Appuser expects a byte array so it is fine to pass this to the PasswordHash field. *** As we are now using Identity Framework, we no longer need to specify the Password Hash
 
-                user.PasswordSalt = hmac.Key; // The hmac instance here is generated with a randomly generated key. Here we set the PasswordSalt to the randomly generated key that is created when the instance of HMACSHA512 is created 
+                // user.PasswordSalt = hmac.Key; // The hmac instance here is generated with a randomly generated key. Here we set the PasswordSalt to the randomly generated key that is created when the instance of HMACSHA512 is created *** As we are now using Identity Framework, we no longer need to specify the Password Salt
+
 
 
 
@@ -66,7 +67,7 @@ namespace API.Controllers
 
             return new UserDto // We return the userDto so that we are able to access it when the method is called. This is the object that will be returned from our http Register post. We do this as we don;t want to receive the actual user object back as this includes the password etc. We also want to receive the token back as this contains the expiry time 
             {
-                Username = user.Username, // we assign the user name to the users user name from the app user we create above
+                Username = user.UserName, // we assign the user name to the users user name from the app user we create above
                 Token = _tokenService.CreateToken(user), // 
 
                 KnownAs = user.KnownAs,
@@ -82,22 +83,22 @@ namespace API.Controllers
 
             Include(p => p.Photos)
             
-            .SingleOrDefaultAsync(x => x.Username == loginDto.Username); // This will return the only element in users that matches our users details. If there is more than one elemt found with the details, it will return an exception. It will return a default value if the username is not found 
+            .SingleOrDefaultAsync(x => x.UserName == loginDto.Username); // This will return the only element in users that matches our users details. If there is more than one elemt found with the details, it will return an exception. It will return a default value if the username is not found 
 
             if (user == null) return Unauthorized("Invalid Username"); // We test whether the default value is returned from the SingleOrDefaultAsync (null). If the default value is returned then this means the username was not found in our database. We return the Unauthorised 
 
-            using var hmac = new HMACSHA512(user.PasswordSalt); // This hmac does the reverse of what we did previously. It takes the PasswordSalt and converts it back to the hash 
+            // using var hmac = new HMACSHA512(user.PasswordSalt); // This hmac does the reverse of what we did previously. It takes the PasswordSalt and converts it back to the hash. *** As we are now using Identity Framework, we no longer need the Password salt
 
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password)); // This gets the hash from the password that is passed into the Login method above so that we can compare it below from the one in our database
+            // var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password)); // This gets the hash from the password that is passed into the Login method above so that we can compare it below from the one in our database *** As we are now using Identity Framework, we no longer need the Password Hash
 
-            for (int i = 0; i < computedHash.Length; i++)  // This method loops over every 'byte' in our computedHash and PasswordHash byte array and checks to see if they match. If they do not match (so the password the user enters does not match the password from the database), the the message 'Invalid Password' is returned
+            // for (int i = 0; i < computedHash.Length; i++)  // This method loops over every 'byte' in our computedHash and PasswordHash byte array and checks to see if they match. If they do not match (so the password the user enters does not match the password from the database), the the message 'Invalid Password' is returned. *** As we are now using Identity Framework, we no longer need the Password Hash
+            // {
+            //     if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid password");
+            // }
+
+            return new UserDto // We return the userDto so that we are able to access it when the method is called. This is the object that will be returned from our http Register post. We do this as we don;t want to receive the actual user object back as this includes the password etc. We also want to receive the token back as this contains the expiry time 
             {
-                if (computedHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid password");
-            }
-
-                  return new UserDto // We return the userDto so that we are able to access it when the method is called. This is the object that will be returned from our http Register post. We do this as we don;t want to receive the actual user object back as this includes the password etc. We also want to receive the token back as this contains the expiry time 
-            {
-                Username = user.Username, // we assign the user name to the users user name from the app user we create above
+                Username = user.UserName, // we assign the user name to the users user name from the app user we create above
                 Token = _tokenService.CreateToken(user), // We get our token using the create token method in our token service file 
                 PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url, // Using the ? optional assignment means that the PhotoUrl is nullable. This means that if there is no IsMain photo, null will be assigned to PhotoUrl.
                 KnownAs = user.KnownAs,
@@ -107,7 +108,7 @@ namespace API.Controllers
 
         private async Task<bool> UserExists(string userName) // This method checks if the userName already exists in our database
         {
-            return await _context.Users.AnyAsync(x => x.Username == userName.ToLower()); // This method simply checks if the userName is found in our database. We convert the userName to lower case as when we send the username to the database, it will also be in lower case so it ensures it is comparing the strings in the same format
+            return await _context.Users.AnyAsync(x => x.UserName == userName.ToLower()); // This method simply checks if the userName is found in our database. We convert the userName to lower case as when we send the username to the database, it will also be in lower case so it ensures it is comparing the strings in the same format
         }
     }
 }

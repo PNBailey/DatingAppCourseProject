@@ -29,7 +29,7 @@ namespace API.Services
             {
                 new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()), // This will be our name identifier for just about everything. We use the NameId do the users ID. We have to use the ToString method on the Id as claims principles have to be strings 
 
-                new Claim(JwtRegisteredClaimNames.UniqueName, user.Username) //We use the UniqueName field to store the user.userName.
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName) //We use the UniqueName field to store the user.userName.
             };
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature); // This object takes a security key and an algorithm 

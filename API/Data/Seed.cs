@@ -23,11 +23,12 @@ namespace API.Data
             foreach(var user in users) {
                 using var hmac = new HMACSHA512();
 
-                user.Username = user.Username.ToLower();
+                user.UserName = user.UserName.ToLower();
 
-                user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes("Pa$$w0rd"));
+                // user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes("Pa$$w0rd")); *** As we are now using Identit Framework, we no longer need to create the Password Hash
 
-                user.PasswordSalt = hmac.Key;
+                // user.PasswordSalt = hmac.Key; *** As we are now using Identit Framework, we no longer need to create the Password Hash
+
 
                 context.Users.Add(user); // This adds tracking to the users througn entity framework. This isn't actually adding the user. This is why we don't use the await keyword here. 
             }

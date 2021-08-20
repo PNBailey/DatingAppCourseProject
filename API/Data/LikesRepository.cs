@@ -26,7 +26,7 @@ namespace API.Data
 
         public async Task<PagedList<LikeDto>> GetUserLikes(LikesParams likesParams)
         {
-            var users = _context.Users.OrderBy(user => user.Username).AsQueryable(); // We use the AsQueryable so that we can build up our queries below
+            var users = _context.Users.OrderBy(user => user.UserName).AsQueryable(); // We use the AsQueryable so that we can build up our queries below
             var likes = _context.Likes.AsQueryable(); // We need to query both the users table and the likes table
 
             if(likesParams.Predicate == "liked") // This is the users that the currently logged in user has liked
@@ -43,7 +43,7 @@ namespace API.Data
 
             var likedUsers = users.Select(user => new LikeDto // We don't use automapper here. We project directly into our Like Dto
             {
-                Username = user.Username,
+                Username = user.UserName,
                 KnownAs = user.KnownAs,
                 Age = user.DateOfBirth.CalculateAge(),
                 PhotoUrl = user.Photos.FirstOrDefault(p => p.IsMain).Url,

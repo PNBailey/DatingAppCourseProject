@@ -13,7 +13,7 @@ import { MessageService } from 'src/app/_services/message.service';
   styleUrls: ['./member-detail.component.css']
 })
 export class MemberDetailComponent implements OnInit {
-  @ViewChild('memberTabs', {static: true}) memberTabs: TabsetComponent; // as the viewchild binds to the template reference variable in the html page, if we used ngif for the whole template using the member that is retrived from the api, the template would be available when this component loads for the view chil to get access to. 
+  @ViewChild('memberTabs', {static: true}) memberTabs: TabsetComponent; // as the viewchild binds to the template reference variable in the html page, if we used ngif for the whole template using the member that is retrived from the api, the template would'nt be available when this component loads for the view chil to get access to. 
   member: Member;
   galleryOptions: NgxGalleryOptions[];
   galleryImages: NgxGalleryImage[];
