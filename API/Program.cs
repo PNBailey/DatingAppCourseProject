@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Data;
+using API.Entities;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,8 +26,10 @@ namespace API
 
             try {
                 var context = services.GetRequiredService<DataContext>();
+                var userManager = services.GetRequiredService<UserManager<AppUser>>();
                 await context.Database.MigrateAsync(); // Using this means that we don't have to use 'dotnet ef Database update'. Once this has been entered, all we need to do is restart out app to apply any changes to the database
-                await Seed.SeedUsers(context);
+                var roleManager = services.GetRequiredService<RoleManager<AppRole>>(); // As we have made the Identiy services available to the whole app by providing it in our startup file, we can get the services throughout our app. 
+                await Seed.SeedUsers(userManager, roleManager); // We want the users to be seeded when the app starts that's why we call this method here
             } catch (Exception ex) {
                 var logger = services.GetRequiredService<ILogger<Program>>();
                 logger.LogError(ex, "An error occured during migration");
