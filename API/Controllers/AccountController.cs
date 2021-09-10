@@ -75,10 +75,14 @@ namespace API.Controllers
 
             if (!result.Succeeded) return BadRequest(result.Errors);
 
+            var roleResult = await _userManager.AddToRoleAsync(user, "Member");
+
+            if(!roleResult.Succeeded) return BadRequest(result.Errors);
+
             return new UserDto // We return the userDto so that we are able to access it when the method is called. This is the object that will be returned from our http Register post. We do this as we don;t want to receive the actual user object back as this includes the password etc. We also want to receive the token back as this contains the expiry time 
             {
                 Username = user.UserName, // we assign the user name to the users user name from the app user we create above
-                Token = _tokenService.CreateToken(user), // 
+                Token = await _tokenService.CreateToken(user), // 
 
                 KnownAs = user.KnownAs,
                 Gender = user.Gender
@@ -113,7 +117,7 @@ namespace API.Controllers
             return new UserDto // We return the userDto so that we are able to access it when the method is called. This is the object that will be returned from our http Register post. We do this as we don;t want to receive the actual user object back as this includes the password etc. We also want to receive the token back as this contains the expiry time 
             {
                 Username = user.UserName, // we assign the user name to the users user name from the app user we create above
-                Token = _tokenService.CreateToken(user), // We get our token using the create token method in our token service file 
+                Token = await _tokenService.CreateToken(user), // We get our token using the create token method in our token service file 
                 PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url, // Using the ? optional assignment means that the PhotoUrl is nullable. This means that if there is no IsMain photo, null will be assigned to PhotoUrl.
                 KnownAs = user.KnownAs,
                 Gender = user.Gender
