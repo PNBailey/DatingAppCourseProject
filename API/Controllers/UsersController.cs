@@ -45,6 +45,8 @@ namespace API.Controllers
         // If WE ARE MAKING DATABASE CALLS, ALWAYS MAKE THE CODE ASYNCHRONOUS 
         // [AllowAnonymous]
 
+        [Authorize(Roles = "Admin")] // Adding this attribute means that only users within the Admin role are able to call the method 
+
         [HttpGet] //We use this attribute when we want to get data from the database 
         public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery]UserParams userParams) // Using the [FromQuery] attribute will mean that the query string will be retrieved from the userParams object we passed in. The api controller is't smart enough to retrieve the query strings (page size etc) from the userParams object without this
         { // We specify the type that we want to get back from the request. We use the collections type Ienumerable and the type of collection we want here is the AppUser type we created in our AppUser Entity class. Ienumerable allows us to use simple iteration over a collection of a specified type. We could have used the 'List' type here instead. This is an async method as we would need to wait for the data to come back and allow other code to execute. This makes the app more scalable 
@@ -73,7 +75,7 @@ namespace API.Controllers
         }
 
         // [Authorize] // This ensures our end point is protected and that the users can only be retrieved if there is a valid user token (so if the user is actaully logged in)
-
+        [Authorize(Roles = "Member")]
         [HttpGet("{username}", Name = "GetUser")] //We use this attribute when we want to get data from the database. As we only want to find one user here and we want to find the uswer by there id, we specify a route parameter. When the client/user hits this endpoint what they are doing is going to api/users/2. We set the name to GetUser so that we can use the route name in our add photo method below
         public async Task<ActionResult<MemberDto>> GetUser(string username)
         { // We pass in the id that we et from the rout parameter 
