@@ -42,6 +42,12 @@ namespace API.Extensions
                  };
              });
 
+
+             services.AddAuthorization(opt => {
+                 opt.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+                 opt.AddPolicy("ModeratePhotoRole", policy => policy.RequireRole("Admin", "Moderator"));
+             }); // This adds the policies that we can then use in our controllers Authorize attributes to restrict access to certain end points
+
              return services;
         }
     }

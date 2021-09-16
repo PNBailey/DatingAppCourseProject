@@ -30,6 +30,7 @@ import { TextInputComponent } from './_forms/text-input/text-input.component';
 import { DateInputComponent } from './_forms/date-input/date-input.component';
 import { ButtonsModule } from 'ngx-bootstrap/buttons';
 import { MemberMessagesComponent } from './members/member-messages/member-messages.component';
+import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
 
 
 
@@ -53,6 +54,7 @@ import { MemberMessagesComponent } from './members/member-messages/member-messag
     TextInputComponent,
     DateInputComponent,
     MemberMessagesComponent,
+    AdminPanelComponent,
   ],
   imports: [
     BrowserModule,
