@@ -6,6 +6,7 @@ export interface User { // interfaces in typescript are different to C# interfac
     photoUrl: string;
     knownAs: string;
     gender: string;
+    roles: string[];
     
 
 }

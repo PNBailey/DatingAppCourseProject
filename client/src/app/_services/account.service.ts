@@ -1,4 +1,5 @@
 import { HttpClient } from '@angular/common/http';
+import { ArrayType } from '@angular/compiler';
 import { Injectable } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -42,6 +43,9 @@ export class AccountService {
   }
 
   setCurrentUser(user: User) {
+    user.roles = [];
+    const roles = this.getDecodedToken(user.token).role;
+    Array.isArray(roles) ? user.roles = roles : user.roles.push(roles); // If the user has more than one roles, the roles above will be an array. If the user only has one role, it will just be a standard object property. Therefore, we need whether it is in array or not before we can add the roles to the user object. The Array.isArray method checks whether what you pass in is an array or not
     localStorage.setItem('user', JSON.stringify(user));
     this.currentUserSource.next(user);
     
@@ -50,6 +54,10 @@ export class AccountService {
   logout() {
     localStorage.removeItem('user');
     this.currentUserSource.next(null);
+  }
+ 
+  getDecodedToken(token) { // We get the users Identity roles from the our JWT token
+    return JSON.parse(atob(token.split('.')[1])); // This atob method allows us to decode the information within the JWT token. The token comes in 3 parts, the header, payload and signituare. We are interested in the payload which is the middle part. We split the token text into three parts (header, payload and signituare) using the split method and we seperate them using a ., we then access the payload using the [1]
   }
 
 

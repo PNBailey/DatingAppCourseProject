@@ -3,7 +3,7 @@
         <div class="container-fluid">
             <a class="navbar-brand" routerLink='/' routerLinkActive='active'>Dating App</a>
             <ul class="navbar-nav mr-auto mb-2 mb-md-0"> 
-                <ng-container  *ngIf="accountService.currentUser$ | async"> <!--The ng container doesn't actually generate any html. It is an angular container it's a very useful thing to do when we want to apply a conditional to something as it doesn't affect the styling as it doesn't affect the html. -->
+                <ng-container  *ngIf="(accountService.currentUser$ | async) as user"> <!--The ng container doesn't actually generate any html. It is an angular container it's a very useful thing to do when we want to apply a conditional to something as it doesn't affect the styling as it doesn't affect the html. -->
                     <li class="nav-item">
                         <a class="nav-link" routerLinkActive='active' routerLink='/members'>Matches</a>
                     </li>
@@ -14,7 +14,7 @@
                         <a class="nav-link" routerLinkActive='active' routerLink="/messages">Messages</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" routerLinkActive='active' routerLink="/admin">Admin</a>
+                        <a class="nav-link" *appHasRole='["Admin", "Moderator"]'  routerLinkActive='active' routerLink="/admin">Admin</a><!--The *appHasRole directive is a custom structural directive that we created manually-->
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" (click)="logout()">logout</a>
