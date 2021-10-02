@@ -8,6 +8,7 @@ using API.Extensions;
 using API.Interfaces;
 using API.Middleware;
 using API.Services;
+using API.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -60,7 +61,11 @@ namespace API
 
             app.UseRouting();
 
-            app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200")); // We add this to allow “Cross origin resource sharing” to prevent the CORS error being triggered when using a http request between our client and our api. WE MUST ADD THIS BETWEEN UseRouting AND UseAuthorization. The parameter we pass in here is the policy we are going to use. We have to AllowAnyHeader, AllowAnyMethod (put requests, get requests etc) and specify the origins we want to allow using 'WithOrigins' which is: http://localhost:4200. What this says is that we will allow any header to be sent and any method to be used (get request put request etc) as long as it comes from the origin http://localhost:4200
+            app.UseCors(policy => policy
+            .AllowAnyHeader()
+            .AllowCredentials() // We add this to enable the ability to send auhorisation with a query string 
+            .AllowAnyMethod()
+            .WithOrigins("https://localhost:4200")); // We add this to allow “Cross origin resource sharing” to prevent the CORS error being triggered when using a http request between our client and our api. WE MUST ADD THIS BETWEEN UseRouting AND UseAuthorization. The parameter we pass in here is the policy we are going to use. We have to AllowAnyHeader, AllowAnyMethod (put requests, get requests etc) and specify the origins we want to allow using 'WithOrigins' which is: http://localhost:4200. What this says is that we will allow any header to be sent and any method to be used (get request put request etc) as long as it comes from the origin http://localhost:4200
 
             app.UseAuthentication(); // We add this when we want to use Authentication. This must go between the UseCors and the UseAuthorization 
 
@@ -68,7 +73,13 @@ namespace API
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers(); // 
+                endpoints.MapControllers(); 
+                
+                // We need to tell our routing about our api/hub endpoints. We pass in the 
+                // PresenceHub class we created which inherits from Hub. The "hub/presence"
+                // is the route. This is the route that this PresenceHub will be accessed from. 
+                // This works in the way that our controller end points work
+                endpoints.MapHub<PresenceHub>("hubs/presence"); 
             });
         }
     }

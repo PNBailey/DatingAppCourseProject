@@ -18,7 +18,7 @@ export function getPaginatedResult<T>(url, params, http: HttpClient) { // We set
     );
   }
 
-  export function getPaginationHeaders(pageNumber: number, pageSize: number) {
+  export function  getPaginationHeaders(pageNumber: number, pageSize: number) {
     let params = new HttpParams(); // This gives us the ability to serialize our parameters. This will take care of adding this onto our query string. 
 
       params = params.append('pageNumber', pageNumber.toString()); // as the page needs to be a query string we need to convert the page from a number to a string 

@@ -1,4 +1,5 @@
 using System.Text;
+using System.Threading.Tasks;
 using API.Data;
 using API.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -40,6 +41,40 @@ namespace API.Extensions
 
 
                  };
+
+                 // We add the below options so that the client can send up the token as a query 
+                 // string. We need this for Signal R as Signalr does not send authentication headers   // like controllers do. Once the below has been completed, we need to add XXXX to our  // CORS config in our startup class. Adding this method means that for Signal R we can // always use a query string, whereas the api controllers will just use the            // authentication header which is defined above. Below, we add a new JWTBearerEvents
+                 // object to the JWTBearerOptions.Events object. This allows us to assign a delegate 
+                 // (query string token) to the events that we want. The event we want to add this to 
+                 // is the OnMessageReceived event. This OnMessageReceived event is invoked when a 
+                 // when a protocol (WebSocket in SignalR's case) message is first received. 
+
+                options.Events = new JwtBearerEvents 
+                {
+                    OnMessageReceived = context => 
+                    {
+
+                        // By default, Signalr will send up the token as a query string with the key,   // "access_token", this is why we use .Query["access_token"] to access 
+                        // the query string. 
+
+                        var accessToken = context.Request.Query["access_token"];
+
+                        // We then need to check the path of the request. We only want to do this 
+                        // for signal r requests so we need to check the url request path to 
+                        // see if it matches (or partialy matches) the end point path that we specified // in our startup class.
+
+                        var path = context.HttpContext.Request.Path;
+
+                        if(!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                  
+                };
+             
              });
 
 
