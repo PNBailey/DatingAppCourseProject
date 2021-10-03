@@ -33,5 +33,41 @@ namespace API.SignalR
             return Task.CompletedTask;
                 
         }
+
+
+        // We also need to create a method to remove the users entry from the dicitonary when
+        // they log out or leave the website
+        public Task UserDisconnected(string username, string connectionId) 
+        {
+            lock (OnlineUsers)
+            {
+                // Here we check to see if there is NOT an entry for the user in the dictionay.
+                // If there isn't then no further action is needed so we just return the 
+                // completed task.
+                if (!OnlineUsers.ContainsKey(username)) return Task.CompletedTask;
+
+
+                // If there is an entry, we must remove it 
+                OnlineUsers[username].Remove(connectionId); // First we remove the connection id for this connection session (remember there may be more than one connection if the user is logged in on multiple devices)
+                if (OnlineUsers[username].Count == 0) // We then check to see if the List in the dictionaries value part of the key value pair is equal to 0. If it is 0 then the user is not logged in on any other devices so we can remove the users entry from the dictionary alltogether
+                {
+                    OnlineUsers.Remove(username);
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task<string[]> GetOnlineUsers()
+        {
+            string[] onlineUsers;
+
+            lock(OnlineUsers)
+            {
+                onlineUsers = OnlineUsers.OrderBy(k => k.Key).Select(k => k.Key).ToArray(); // Each key here is a users username. The .ToArray executes the request. We order the OnlineUsers by their username and we select just the usernames to return. We're not interested in the connection id's here. 
+            }
+
+            return Task.FromResult(onlineUsers);
+        }
     }
 }

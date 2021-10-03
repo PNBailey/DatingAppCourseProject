@@ -3,6 +3,7 @@ using API.Entities;
 using API.Helpers;
 using API.Interfaces;
 using API.Services;
+using API.SignalR;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,8 @@ namespace API.Extensions
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
         { // The method must also be static. We are extending the IServiceCollection and creating this method to creae our application service
 
+
+            services.AddSingleton<PresenceTracker>(); // As we are using a dicitonary to store the logged in users, it is a shared resource. We want all connections to share the same resource. This approach isn't scalable. 
             services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings")); // The "cloudinarysettings" is the name we gave it in our appsettings.json file. We pass in our CloudinarySettings type and this uses our strongly typed configuration settings class we created
 
             services.AddIdentityCore<AppUser>(opt => { // Here we configure Identity. If we wre building an MVC type application where our client side of the aplication was being served by .NET and we were using Razor pages (which are served by the .NET server) then we could use the default Identity. 
