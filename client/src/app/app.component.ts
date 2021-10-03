@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { User } from './Models/user';
 import { AccountService } from './_services/account.service';
+import { PresenceService } from './_services/presence.service';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +13,7 @@ export class AppComponent implements OnInit {
   title = 'Dating app';
   users: any;
 
-  constructor(private accountService: AccountService) {}
+  constructor(private accountService: AccountService, private presence: PresenceService) {}
 
   ngOnInit() {
   //  this.getUsers(); // We call the getusers method when this component is created
@@ -20,8 +21,11 @@ export class AppComponent implements OnInit {
   }
 
   setCurrentUser() {
-    const user: User = JSON.parse(localStorage.getItem('user'));
-    this.accountService.setCurrentUser(user);
+    const user: User = JSON.parse(localStorage.getItem('user')); // When the app component loads, it checks to see if there is a user in the local storage (this means there is a currently logged in user)
+    if(user) {
+      this.accountService.setCurrentUser(user); // if there is a user, it sets the user in our replay subject in our account service.
+      this.presence.createHubConnection(user); // If there is a user, a hib connection is created for Signal R using the createHubConnection in the presence service 
+    }
   }
 
   // We move the getUsers code into our home component 

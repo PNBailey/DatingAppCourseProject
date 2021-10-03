@@ -5,6 +5,7 @@ import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { User } from '../Models/user';
+import { PresenceService } from './presence.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class AccountService {
   private currentUserSource = new ReplaySubject<User>(1); // This is a special type of observable. I'ts lile a buffer object. It's going to store the values in here and anytime a subscriber subscribes to the observable, it's going to emit the last value inside it. In the parenthesis, we specify how many previous values we want it to store 
   currentUser$ = this.currentUserSource.asObservable(); // By convention, we add a $ at the end of an observable name. 
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private presence: PresenceService) { }
 
   login(model: any) {
     return this.http.post(this.baseUrl + 'account/login', model).pipe( // The pipe RXJS operator allows us to do something with the data that comes back from the http request so that when we subscribe to the Observable, the data received in the subscription is the transformed data.
@@ -24,6 +25,7 @@ export class AccountService {
         const user = response; // This saves the response to a user variable that we can use in a test below
         if(user) {
           this.setCurrentUser(user);
+          this.presence.createHubConnection(user);
         }
       })
     ) 
@@ -36,6 +38,7 @@ export class AccountService {
     map((user: User) => {
       if(user) {
         this.setCurrentUser(user);
+        this.presence.createHubConnection(user);
       }
       return user;
     }))
@@ -54,6 +57,7 @@ export class AccountService {
   logout() {
     localStorage.removeItem('user');
     this.currentUserSource.next(null);
+    this.presence.stopHubConnection(); // We want to stop the Signal R hub connection when the user logs out
   }
  
   getDecodedToken(token) { // We get the users Identity roles from the our JWT token

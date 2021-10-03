@@ -48,6 +48,7 @@ namespace API
              services.AddCors(); // We add this to allow “Cross origin resource sharing” to prevent the CORS error being triggered when using a http request between our client and our api. 
 
               services.AddIdentityServices(_config); 
+              services.AddSignalR();
              }
 
             
